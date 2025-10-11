@@ -1,9 +1,6 @@
 import type { 
-  Stock, 
-  User, 
   LoginResponse, 
   RegisterResponse, 
-  TradeRequest, 
   TradeResponse, 
   MarketOverview, 
   StockBasicInfo, 
@@ -13,8 +10,6 @@ import type {
   Shareholder, 
   Dividend, 
   Category, 
-  Order, 
-  Position 
 } from '../types'
 
 // 基础API配置
