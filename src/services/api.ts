@@ -1,18 +1,7 @@
-import type { 
-  LoginResponse, 
-  RegisterResponse, 
-  TradeResponse, 
-  MarketOverview, 
-  StockBasicInfo, 
-  Executive, 
-  ExecutiveTransaction, 
-  Event, 
-  Shareholder, 
-  Dividend, 
-  Category, 
-} from '../types'
+import '../types'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
+import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData } from '../types'
 
 const userStore = useUserStore()
 
@@ -63,32 +52,44 @@ async function apiRequest(endpoint: string, options: any = {}) {
 
   return apiClient.request(config)
 }
+// GET请求
+async function get(endpoint: string, options: any = {}) {
+  return apiRequest(endpoint, {
+    method: 'GET',
+    ...options,
+  }).then(res => res.data)
+}
+// POST请求
+async function post(endpoint: string, options: any = {}) {
+  return apiRequest(endpoint, {
+    method: 'POST',
+    ...options,
+  }).then(res => res.data)
+}
 
 // 用户认证相关API
 export const authAPI = {
   // 用户登录
-  async login(username: string, password: string): Promise<LoginResponse> {
-    const response = await apiRequest('/api/login', {
-      method: 'POST',
+  async login(username: string, password: string): Promise<AuthedResponse<UserData>> {
+    const response = await post('/api/login', {
       body: JSON.stringify({ username, password }),
     })
     
-    if (response.data.success && response.data.token) {
-      userStore.login(response.data.token, response.data.user)
+    if (response.success && response.token) {
+      userStore.login(response.token, response.user)
     }
     
     return response
   },
 
   // 用户注册
-  async register(username: string, password: string): Promise<RegisterResponse> {
-    const response = await apiRequest('/api/register', {
-      method: 'POST',
+  async register(username: string, password: string): Promise<AuthedResponse<null>> {
+    const response = await post('/api/register', {
       body: JSON.stringify({ username, password }),
     })
     
-    if (response.data.success && response.data.token) {
-      userStore.login(response.data.token, response.data.user)
+    if (response.success && response.token) {
+      userStore.login(response.token, response.user)
     }
     return response
     
@@ -96,9 +97,7 @@ export const authAPI = {
 
   // 用户登出
   async logout() {
-    const response = await apiRequest('/auth/logout', {
-      method: 'POST',
-    })
+    const response = await post('/auth/logout')
     
     userStore.logout()
     return response
@@ -108,9 +107,8 @@ export const authAPI = {
 // 交易相关API
 export const tradeAPI = {
   // 执行交易
-  async trade(stock_id: number, quantity: number, price: number, type: 'BUY' | 'SELL'): Promise<TradeResponse> {
-    return apiRequest('/auth/trade', {
-      method: 'POST',
+  async trade(stock_id: number, quantity: number, price: number, type: 'BUY' | 'SELL'): Promise<AuthedResponse<number>> {
+    return post('/auth/trade', {
       body: JSON.stringify({
         stock_id,
         quantity,
@@ -124,18 +122,17 @@ export const tradeAPI = {
 // 市场数据相关API
 export const marketAPI = {
   // 获取市场概览
-  async getMarketOverview(): Promise<MarketOverview> {
-    return apiRequest('/api/market')
+  async getMarketOverview(params: MarketOverviewRequest): Promise<MarketOverviewResponse> {
+    return get('/api/market', {
+      params,
+    })
   },
 
   // 获取股票基本信息
-  async getStockBasicInfo(stock_id: number): Promise<StockBasicInfo> {
-    return apiRequest(`/api/stock/basic?id=${stock_id}`)
-  },
-
-  // 获取股票实时行情
-  async getStockQuote(stock_id: number) {
-    return apiRequest(`/api/stock/quote?id=${stock_id}`)
+  async getStockBasicInfo(params: StockBasicInfoRequest): Promise<StockBasicInfoResponse> {
+    return get(`/api/stock/basic`, {
+      params,
+    })
   },
 }
 interface PageQueryParam {
@@ -152,37 +149,37 @@ interface DateQueryParam {
 export const stockAPI = {
   // 获取高管信息
   async getExecutives(params: PageQueryParam): Promise<Executive[]> {
-    return apiRequest(`/api/stock/executives`, {
+    return get(`/api/stock/executives`, {
       params,
-    }).then((res) => res.data)
+    })
   },
 
   // 获取高管交易记录
   async getExecutiveTransactions(params: DateQueryParam): Promise<ExecutiveTransaction[]> {
-    return apiRequest(`/api/stock/executive-transactions`, {
-      params,
-    }).then((res) => res.data)
+    return get(`/api/stock/executive-transactions`, {
+      params, 
+    })
   },
 
   // 获取公司事件
   async getEvents(params: PageQueryParam): Promise<Event[]> {
-    return apiRequest(`/api/stock/events`, {
+    return get(`/api/stock/events`, {
       params,
-    }).then((res) => res.data)
+    })
   },
 
   // 获取股东信息
   async getShareholders(params: PageQueryParam): Promise<Shareholder[]> {
-    return apiRequest(`/api/stock/shareholders`, {
+    return get(`/api/stock/shareholders`, {
       params,
-    }).then((res) => res.data)
+    })
   },
 
   // 获取分红信息
   async getDividends(params: YearQueryParam): Promise<Dividend[]> {
-    return apiRequest(`/api/stock/dividends`, {
+    return get(`/api/stock/dividends`, {
       params,
-    }).then((res) => res.data)
+    })
   },
 }
 interface YearQueryParam {
@@ -192,8 +189,10 @@ interface YearQueryParam {
 // 分类相关API
 export const categoryAPI = {
   // 获取概念和行业分类
-  async getCategories(): Promise<Category> {
-    return apiRequest('/api/categories')
+  async getCategories(params: CategoriesRequest): Promise<CategoriesResponse> {
+    return get('/api/categories', {
+      params,
+    })
   },
 }
 
