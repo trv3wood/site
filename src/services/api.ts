@@ -2,6 +2,7 @@ import '../types'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
 import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData, Event } from '../types'
+import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 
 // 基础API配置
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -100,14 +101,10 @@ export const authAPI = {
   // 用户注册
   async register(username: string, password: string): Promise<AuthedResponse<null>> {
     const response = await post('/api/register', {
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, confirmPassword: password }),
     }) as AuthedResponse<null>
     
-    if (!response.success) {
-      console.log('Register failed:', response.message)
-    }
     return response
-    
   },
 
   // 用户登出
@@ -150,20 +147,6 @@ export const marketAPI = {
       params,
     })
   },
-}
-interface PageQueryParam {
-  id: number;
-  size?: number;
-  page?: number;
-}
-interface DateQueryParam {
-  stock_id: number;
-  start_date: string;
-  end_date: string;
-}
-interface YearQueryParam {
-  stock_id: number;
-  year: number;
 }
 // 股票详情相关API
 export const stockAPI = {

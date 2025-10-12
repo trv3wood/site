@@ -24,6 +24,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import api from '@/services/api'
+import type { AxiosError } from 'axios'
 
 const router = useRouter()
 const registerForm = ref()
@@ -61,24 +62,20 @@ const rules = {
 
 const handleRegister = async () => {
   if (!registerForm.value) return
-  
+
   const valid = await registerForm.value.validate()
   if (!valid) return
-  
+
   loading.value = true
-  
+
   try {
-    const response = await api.auth.register(form.username, form.password)
-    
-    if (response.success) {
-      ElMessage.success('注册成功')
-      router.push('/market')
-    } else {
-      ElMessage.error(response.message || '注册失败')
-    }
-  } catch (error) {
-    ElMessage.error('注册失败，请检查网络连接')
-    console.error('Register error:', error)
+    await api.auth.register(form.username, form.password)
+    ElMessage.success('注册成功')
+    router.push('/login')
+  } catch (e) {
+    const err = e as AxiosError
+    ElMessage.error(err.response?.data || '注册失败，请检查网络连接')
+    console.error('Register error:', err)
   } finally {
     loading.value = false
   }

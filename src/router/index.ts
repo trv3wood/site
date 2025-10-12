@@ -26,20 +26,13 @@ const router = createRouter({
     // 公共路由
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/market'
     },
     {
       path: '/market',
       name: 'market',
       component: () => import('@/views/MarketView.vue'),
       meta: { title: '大盘行情' }
-    },
-    {
-      path: '/stock',
-      name: 'stock-detail',
-      component: () => import('@/views/StockDetailView.vue'),
-      props: true,
-      meta: { title: '个股详情' }
     },
     // {
     //   path: '/stock/:code/realtime',
@@ -48,14 +41,14 @@ const router = createRouter({
     //   props: true,
     //   meta: { title: '实时行情' }
     // },
-    // {
-    //   path: '/stock/:code/info',
-    //   name: 'stock-info',
-    //   component: () => import('@/views/StockInfoView.vue'),
-    //   props: true,
-    //   meta: { title: '个股信息' }
-    // },
-    
+    {
+      path: '/stock/:id/info',
+      name: 'stock-info',
+      component: () => import('@/views/StockInfoView.vue'),
+      props: true,
+      meta: { title: '个股信息' }
+    },
+
     // 游客专属路由
     {
       path: '/login',
@@ -71,7 +64,7 @@ const router = createRouter({
       beforeEnter: requireGuest,
       meta: { title: '用户注册' }
     },
-    
+
     // 登录用户专属路由
     // {
     //   path: '/dashboard',
@@ -117,7 +110,7 @@ const router = createRouter({
     //   beforeEnter: requireAuth,
     //   meta: { title: '个股盈亏分析' }
     // },
-    
+
     // // 404 页面
     // {
     //   path: '/:pathMatch(.*)*',

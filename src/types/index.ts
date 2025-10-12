@@ -88,10 +88,9 @@ export interface ExecutiveTransactionRequest {
 export interface ExecutiveTransaction {
   after_change_quantity: number;
   change_date: string;
-  change_id: number;
   change_quantity: number;
   change_type: string;
-  executive_id: number;
+  executive_name: string;
   [property: string]: any;
 }
 export interface DividendsRequest {
@@ -158,4 +157,20 @@ export interface StockBasicInfoResponse {
   stock_name: string;
   total_shares: number;
   [property: string]: any;
+}
+
+export interface YearQueryParam {
+  stock_id: number;
+  year: number | null;
+}
+
+export interface PageQueryParam {
+  id: number;
+  size?: number;
+  page?: number;
+}
+export interface DateQueryParam {
+  stock_id: number;
+  start_date: string | null;
+  end_date: string | null;
 }

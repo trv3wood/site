@@ -34,25 +34,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="stock in stocks" :key="stock.code" @click="$router.push(`/stock/${stock.code}`)"
+          <tr v-for="stock in stocks" :key="stock.stock_id" @click="$router.push(`/stock/${stock.stock_id}/info`)"
             class="stock-row">
-            <td>{{ stock.stock_code}}</td>
-            <td>{{ stock.stock_name}}</td>
-            <td>{{ stock.open_price}}</td>
-            <td :class="{ 'text-red': stock.change_rate < 0, 'text-green': stock.change_rate > 0 }">
-              {{ stock.current_price}}
+            <td>{{ stock.stock_code }}</td>
+            <td>{{ stock.stock_name }}</td>
+            <td>{{ stock.open_price }}</td>
+            <td :class="{ 'text-red': stock.change_rate > 0, 'text-green': stock.change_rate < 0 }">
+              {{ stock.current_price }}
             </td>
             <td>{{ stock.high_price }}</td>
             <td>{{ stock.low_price }}</td>
-            <td :class="{ 'text-red': stock.change_rate < 0, 'text-green': stock.change_rate > 0 }">
-              {{ stock.change_rate}}%
+            <td :class="{ 'text-red': stock.change_rate > 0, 'text-green': stock.change_rate < 0 }">
+              {{ stock.change_rate }}%
             </td>
-            <td :class="{ 'text-red': stock.change < 0, 'text-green': stock.change > 0 }">
-              {{ stock.change}}
+            <td :class="{ 'text-red': stock.change > 0, 'text-green': stock.change < 0 }">
+              {{ stock.change }}
             </td>
             <td>{{ stock.volume }}</td>
             <td>{{ stock.turnover }}</td>
-            <td>{{ stock.market_cap}}</td>
+            <td>{{ stock.market_cap }}</td>
             <td>{{ stock.turnover_rate }}%</td>
           </tr>
         </tbody>
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import type { MarketOverviewResponse as Stock } from '@/types/index'
 import { marketAPI } from '@/services/api'
 
@@ -73,9 +73,16 @@ const fetchMarketData = async () => {
   stocks.value = await marketAPI.getMarketOverview({ type: activeTab.value })
   console.log(stocks.value.length)
 }
+let intervalId = -1
 
 onMounted(() => {
   fetchMarketData()
+  intervalId = setInterval(() => {
+    fetchMarketData()
+  }, 5000)
+})
+onUnmounted(() => {
+  clearInterval(intervalId)
 })
 </script>
 
