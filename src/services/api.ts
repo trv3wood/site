@@ -3,10 +3,8 @@ import { useUserStore } from '@/stores/user'
 import axios from 'axios'
 import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData } from '../types'
 
-const userStore = useUserStore()
-
 // 基础API配置
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // 创建axios实例
 const apiClient = axios.create({
@@ -19,13 +17,11 @@ const apiClient = axios.create({
 // 请求拦截器 - 添加认证头部
 apiClient.interceptors.request.use(
   (config) => {
+    const userStore = useUserStore()
     if (userStore.isLoggedIn && userStore.token) {
       config.headers.Authorization = `Bearer ${userStore.token}`
     }
     return config
-  },
-  (error) => {
-    return Promise.reject(error)
   }
 )
 
@@ -76,6 +72,7 @@ export const authAPI = {
     })
     
     if (response.success && response.token) {
+      const userStore = useUserStore()
       userStore.login(response.token, response.user)
     }
     
@@ -89,6 +86,7 @@ export const authAPI = {
     })
     
     if (response.success && response.token) {
+      const userStore = useUserStore()
       userStore.login(response.token, response.user)
     }
     return response
@@ -99,6 +97,7 @@ export const authAPI = {
   async logout() {
     const response = await post('/auth/logout')
     
+    const userStore = useUserStore()
     userStore.logout()
     return response
   },
@@ -202,4 +201,9 @@ export default {
   market: marketAPI,
   stock: stockAPI,
   category: categoryAPI,
+  client: {
+    apiRequest,
+    get,
+    post,
+  }
 }

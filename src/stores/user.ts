@@ -7,11 +7,6 @@ interface User {
   balance: number
 }
 
-interface AuthState {
-  token: string | null
-  user: User | null
-}
-
 export const useUserStore = defineStore('user', () => {
   // 状态
   const token = ref<string | null>(null)

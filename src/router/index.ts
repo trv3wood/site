@@ -41,20 +41,20 @@ const router = createRouter({
       props: true,
       meta: { title: '个股详情' }
     },
-    {
-      path: '/stock/:code/realtime',
-      name: 'stock-realtime',
-      component: () => import('@/views/StockRealtimeView.vue'),
-      props: true,
-      meta: { title: '实时行情' }
-    },
-    {
-      path: '/stock/:code/info',
-      name: 'stock-info',
-      component: () => import('@/views/StockInfoView.vue'),
-      props: true,
-      meta: { title: '个股信息' }
-    },
+    // {
+    //   path: '/stock/:code/realtime',
+    //   name: 'stock-realtime',
+    //   component: () => import('@/views/StockRealtimeView.vue'),
+    //   props: true,
+    //   meta: { title: '实时行情' }
+    // },
+    // {
+    //   path: '/stock/:code/info',
+    //   name: 'stock-info',
+    //   component: () => import('@/views/StockInfoView.vue'),
+    //   props: true,
+    //   meta: { title: '个股信息' }
+    // },
     
     // 游客专属路由
     {
@@ -73,58 +73,58 @@ const router = createRouter({
     },
     
     // 登录用户专属路由
-    {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('@/views/DashboardView.vue'),
-      beforeEnter: requireAuth,
-      meta: { title: '用户主页' }
-    },
-    {
-      path: '/trade/:code',
-      name: 'trade',
-      component: () => import('@/views/TradeView.vue'),
-      props: true,
-      beforeEnter: requireAuth,
-      meta: { title: '股票交易' }
-    },
-    {
-      path: '/portfolio',
-      name: 'portfolio',
-      component: () => import('@/views/PortfolioView.vue'),
-      beforeEnter: requireAuth,
-      meta: { title: '我的持仓' }
-    },
-    {
-      path: '/transactions',
-      name: 'transactions',
-      component: () => import('@/views/TransactionsView.vue'),
-      beforeEnter: requireAuth,
-      meta: { title: '交易记录' }
-    },
-    {
-      path: '/analysis',
-      name: 'analysis',
-      component: () => import('@/views/AnalysisView.vue'),
-      beforeEnter: requireAuth,
-      meta: { title: '账户分析' }
-    },
-    {
-      path: '/stock-analysis/:code',
-      name: 'stock-analysis',
-      component: () => import('@/views/StockAnalysisView.vue'),
-      props: true,
-      beforeEnter: requireAuth,
-      meta: { title: '个股盈亏分析' }
-    },
+    // {
+    //   path: '/dashboard',
+    //   name: 'dashboard',
+    //   component: () => import('@/views/DashboardView.vue'),
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '用户主页' }
+    // },
+    // {
+    //   path: '/trade/:code',
+    //   name: 'trade',
+    //   component: () => import('@/views/TradeView.vue'),
+    //   props: true,
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '股票交易' }
+    // },
+    // {
+    //   path: '/portfolio',
+    //   name: 'portfolio',
+    //   component: () => import('@/views/PortfolioView.vue'),
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '我的持仓' }
+    // },
+    // {
+    //   path: '/transactions',
+    //   name: 'transactions',
+    //   component: () => import('@/views/TransactionsView.vue'),
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '交易记录' }
+    // },
+    // {
+    //   path: '/analysis',
+    //   name: 'analysis',
+    //   component: () => import('@/views/AnalysisView.vue'),
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '账户分析' }
+    // },
+    // {
+    //   path: '/stock-analysis/:code',
+    //   name: 'stock-analysis',
+    //   component: () => import('@/views/StockAnalysisView.vue'),
+    //   props: true,
+    //   beforeEnter: requireAuth,
+    //   meta: { title: '个股盈亏分析' }
+    // },
     
-    // 404 页面
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('@/views/NotFoundView.vue'),
-      meta: { title: '页面未找到' }
-    }
+    // // 404 页面
+    // {
+    //   path: '/:pathMatch(.*)*',
+    //   name: 'not-found',
+    //   component: () => import('@/views/NotFoundView.vue'),
+    //   meta: { title: '页面未找到' }
+    // }
   ],
 })
 
