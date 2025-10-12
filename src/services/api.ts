@@ -1,7 +1,7 @@
 import '../types'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
-import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData } from '../types'
+import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData, Event } from '../types'
 
 // 基础API配置
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -144,46 +144,46 @@ interface DateQueryParam {
   start_date: string;
   end_date: string;
 }
+interface YearQueryParam {
+  stock_id: number;
+  year: number;
+}
 // 股票详情相关API
 export const stockAPI = {
   // 获取高管信息
   async getExecutives(params: PageQueryParam): Promise<Executive[]> {
-    return get(`/api/stock/executives`, {
+    return get(`./api/stock/executives`, {
       params,
     })
   },
 
   // 获取高管交易记录
   async getExecutiveTransactions(params: DateQueryParam): Promise<ExecutiveTransaction[]> {
-    return get(`/api/stock/executive-transactions`, {
+    return get(`./api/stock/executive-transactions`, {
       params, 
     })
   },
 
   // 获取公司事件
   async getEvents(params: PageQueryParam): Promise<Event[]> {
-    return get(`/api/stock/events`, {
+    return get(`./api/stock/events`, {
       params,
     })
   },
 
   // 获取股东信息
   async getShareholders(params: PageQueryParam): Promise<Shareholder[]> {
-    return get(`/api/stock/shareholders`, {
+    return get(`./api/stock/shareholders`, {
       params,
     })
   },
 
   // 获取分红信息
   async getDividends(params: YearQueryParam): Promise<Dividend[]> {
-    return get(`/api/stock/dividends`, {
+    return get(`./api/stock/dividends`, {
       params,
     })
   },
-}
-interface YearQueryParam {
-  stock_id: number;
-  year: number;
 }
 // 分类相关API
 export const categoryAPI = {

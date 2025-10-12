@@ -26,7 +26,7 @@ const router = createRouter({
     // 公共路由
     {
       path: '/',
-      redirect: '/market'
+      redirect: '/login'
     },
     {
       path: '/market',
@@ -35,7 +35,7 @@ const router = createRouter({
       meta: { title: '大盘行情' }
     },
     {
-      path: '/stock/:code',
+      path: '/stock',
       name: 'stock-detail',
       component: () => import('@/views/StockDetailView.vue'),
       props: true,
