@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import api from '@/services/api'
@@ -37,14 +37,14 @@ const handleLogout = async () => {
   }
 }
 
-onMounted(async () => {
-  try {
-    const test = await api.client.get('/index')
-    console.log(test)
-  } catch (error) {
-    console.error('API测试失败:', error)
-  }
-})
+// onMounted(async () => {
+//   try {
+//     const test = await api.client.apiRequest('/index')
+//     console.log(test)
+//   } catch (error) {
+//     console.error('API测试失败:', error)
+//   }
+// })
 </script>
 
 <template>

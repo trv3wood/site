@@ -3,27 +3,18 @@
     <div class="header">
       <h1>大盘行情</h1>
       <div class="market-tabs">
-        <button 
-          :class="{ active: activeTab === 'sh' }" 
-          @click="activeTab = 'sh'"
-        >
+        <button :class="{ active: activeTab === 'sh' }" @click="activeTab = 'sh'; fetchMarketData()">
           沪市 (6开头)
         </button>
-        <button 
-          :class="{ active: activeTab === 'sz' }" 
-          @click="activeTab = 'sz'"
-        >
-          深市 (3开头)
+        <button :class="{ active: activeTab === 'sz' }" @click="activeTab = 'sz'; fetchMarketData()">
+          深市 (0开头)
         </button>
-        <button 
-          :class="{ active: activeTab === 'cyb' }" 
-          @click="activeTab = 'cyb'"
-        >
-          创业板 (0开头)
+        <button :class="{ active: activeTab === 'cyb' }" @click="activeTab = 'cyb'; fetchMarketData()">
+          创业板 (3开头)
         </button>
       </div>
     </div>
-    
+
     <div class="stock-table">
       <table>
         <thead>
@@ -43,30 +34,26 @@
           </tr>
         </thead>
         <tbody>
-          <tr 
-            v-for="stock in filteredStocks" 
-            :key="stock.code"
-            @click="$router.push(`/stock/${stock.code}`)"
-            class="stock-row"
-          >
-            <td>{{ stock.code }}</td>
-            <td>{{ stock.name }}</td>
-            <td>{{ stock.openPrice }}</td>
-            <td :class="{ 'text-red': stock.changePercent < 0, 'text-green': stock.changePercent > 0 }">
-              {{ stock.currentPrice }}
+          <tr v-for="stock in stocks" :key="stock.code" @click="$router.push(`/stock/${stock.code}`)"
+            class="stock-row">
+            <td>{{ stock.stock_code}}</td>
+            <td>{{ stock.stock_name}}</td>
+            <td>{{ stock.open_price}}</td>
+            <td :class="{ 'text-red': stock.change_rate < 0, 'text-green': stock.change_rate > 0 }">
+              {{ stock.current_price}}
             </td>
-            <td>{{ stock.highPrice }}</td>
-            <td>{{ stock.lowPrice }}</td>
-            <td :class="{ 'text-red': stock.changePercent < 0, 'text-green': stock.changePercent > 0 }">
-              {{ stock.changePercent }}%
+            <td>{{ stock.high_price }}</td>
+            <td>{{ stock.low_price }}</td>
+            <td :class="{ 'text-red': stock.change_rate < 0, 'text-green': stock.change_rate > 0 }">
+              {{ stock.change_rate}}%
             </td>
-            <td :class="{ 'text-red': stock.changeAmount < 0, 'text-green': stock.changeAmount > 0 }">
-              {{ stock.changeAmount }}
+            <td :class="{ 'text-red': stock.change < 0, 'text-green': stock.change > 0 }">
+              {{ stock.change}}
             </td>
             <td>{{ stock.volume }}</td>
             <td>{{ stock.turnover }}</td>
-            <td>{{ stock.marketValue }}</td>
-            <td>{{ stock.turnoverRate }}%</td>
+            <td>{{ stock.market_cap}}</td>
+            <td>{{ stock.turnover_rate }}%</td>
           </tr>
         </tbody>
       </table>
@@ -75,43 +62,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import type { Stock } from '@/types/index'
+import { ref, onMounted } from 'vue'
+import type { MarketOverviewResponse as Stock } from '@/types/index'
+import { marketAPI } from '@/services/api'
 
 const activeTab = ref<'sh' | 'sz' | 'cyb'>('sh')
 const stocks = ref<Stock[]>([])
 
-const filteredStocks = computed(() => {
-  return stocks.value.filter(stock => {
-    if (activeTab.value === 'sh') {
-      return stock.code.startsWith('6')
-    } else if (activeTab.value === 'sz') {
-      return stock.code.startsWith('3')
-    } else {
-      return stock.code.startsWith('0')
-    }
-  })
-})
-
 const fetchMarketData = async () => {
-  // 模拟数据，实际应该调用后端API
-  stocks.value = [
-    {
-      code: '600000',
-      name: '浦发银行',
-      openPrice: 8.5,
-      currentPrice: 8.6,
-      highPrice: 8.7,
-      lowPrice: 8.4,
-      changePercent: 1.18,
-      changeAmount: 0.1,
-      volume: 1000000,
-      turnover: 8600000,
-      marketValue: 1000000000,
-      turnoverRate: 0.86
-    },
-    // 更多模拟数据...
-  ]
+  stocks.value = await marketAPI.getMarketOverview({ type: activeTab.value })
+  console.log(stocks.value.length)
 }
 
 onMounted(() => {
@@ -157,7 +117,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: center;
   border-bottom: 1px solid #ddd;

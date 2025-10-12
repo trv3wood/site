@@ -44,21 +44,16 @@ const rules = {
 
 const handleLogin = async () => {
   if (!loginForm.value) return
-  
+
   const valid = await loginForm.value.validate()
   if (!valid) return
-  
+
   loading.value = true
-  
+
   try {
-    const response = await api.auth.login(form.username, form.password)
-    
-    if (response.success) {
-      ElMessage.success('登录成功')
-      router.push('/market')
-    } else {
-      ElMessage.error(response.message || '登录失败')
-    }
+    await api.auth.login(form.username, form.password)
+    ElMessage.success('登录成功')
+    router.push('/market')
   } catch (error) {
     ElMessage.error('登录失败，请检查网络连接')
     console.error('Login error:', error)

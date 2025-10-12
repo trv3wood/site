@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
 )
 
 // 通用请求函数
-async function apiRequest(endpoint: string, options: any = {}) {
+async function apiRequest(endpoint: string, options: any = {}): Promise<any> {
   const config = {
     url: endpoint,
     method: options.method || 'GET',
@@ -50,17 +50,34 @@ async function apiRequest(endpoint: string, options: any = {}) {
 }
 // GET请求
 async function get(endpoint: string, options: any = {}) {
-  return apiRequest(endpoint, {
-    method: 'GET',
-    ...options,
-  }).then(res => res.data)
+  try {
+    const response = await apiRequest(endpoint, {
+      method: 'GET',
+      ...options,
+    })
+    console.debug('GET request response:', response)
+    return response
+  } catch (error) {
+    console.error('GET request failed:', error)
+    throw error
+  }
 }
 // POST请求
 async function post(endpoint: string, options: any = {}) {
-  return apiRequest(endpoint, {
-    method: 'POST',
-    ...options,
-  }).then(res => res.data)
+  try {
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      ...options,
+    })
+    if (!response.success) {
+      throw new Error(response.message || 'POST request failed')
+    }
+    console.debug('POST request response:', response)
+    return response
+  } catch (error) {
+    console.error('POST request failed:', error)
+    throw error
+  }
 }
 
 // 用户认证相关API
@@ -71,9 +88,10 @@ export const authAPI = {
       body: JSON.stringify({ username, password }),
     })
     
-    if (response.success && response.token) {
+    if (response.success && response.data.token) {
       const userStore = useUserStore()
-      userStore.login(response.token, response.user)
+      userStore.login(response.data.token, response.data.user)
+      console.log('Login successful', userStore.user)
     }
     
     return response
@@ -83,11 +101,10 @@ export const authAPI = {
   async register(username: string, password: string): Promise<AuthedResponse<null>> {
     const response = await post('/api/register', {
       body: JSON.stringify({ username, password }),
-    })
+    }) as AuthedResponse<null>
     
-    if (response.success && response.token) {
-      const userStore = useUserStore()
-      userStore.login(response.token, response.user)
+    if (!response.success) {
+      console.log('Register failed:', response.message)
     }
     return response
     
@@ -121,7 +138,7 @@ export const tradeAPI = {
 // 市场数据相关API
 export const marketAPI = {
   // 获取市场概览
-  async getMarketOverview(params: MarketOverviewRequest): Promise<MarketOverviewResponse> {
+  async getMarketOverview(params: MarketOverviewRequest): Promise<MarketOverviewResponse[]> {
     return get('/api/market', {
       params,
     })
