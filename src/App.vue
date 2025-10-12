@@ -1,4 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import api from '@/services/api';
+
+onMounted(async () => {
+  const test = await api.client.apiRequest('/index');
+  console.log(test);
+})
+</script>
 
 <template>
   <h1>You did it!</h1>
