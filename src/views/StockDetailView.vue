@@ -5,23 +5,33 @@
       <div class="nav-tabs">
         <router-link :to="`/stock/${stockCode}/realtime`" class="nav-tab">实时行情</router-link>
         <router-link :to="`/stock/${stockCode}/info`" class="nav-tab">个股信息</router-link>
-        <button v-if="$route.meta.requiresAuth" @click="$router.push(`/trade/${stockCode}`)" class="trade-btn">
+        <button
+          v-if="$route.meta.requiresAuth"
+          @click="$router.push(`/trade/${stockCode}`)"
+          class="trade-btn"
+        >
           交易
         </button>
       </div>
     </div>
-    
+
     <div class="stock-info">
       <div class="price-section">
-        <div class="current-price" :class="{ 'text-red': stock?.changePercent < 0, 'text-green': stock?.changePercent > 0 }">
+        <div
+          class="current-price"
+          :class="{ 'text-red': stock?.changePercent < 0, 'text-green': stock?.changePercent > 0 }"
+        >
           {{ stock?.currentPrice }}
         </div>
-        <div class="price-change" :class="{ 'text-red': stock?.changePercent < 0, 'text-green': stock?.changePercent > 0 }">
+        <div
+          class="price-change"
+          :class="{ 'text-red': stock?.changePercent < 0, 'text-green': stock?.changePercent > 0 }"
+        >
           <span>{{ stock?.changeAmount }}</span>
           <span>{{ stock?.changePercent }}%</span>
         </div>
       </div>
-      
+
       <div class="detail-grid">
         <div class="detail-item">
           <label>开盘价</label>
@@ -41,7 +51,7 @@
         </div>
       </div>
     </div>
-    
+
     <router-view />
   </div>
 </template>
@@ -78,7 +88,7 @@ const fetchStockData = async () => {
     lowPrice: 10.3,
     changePercent: 2.86,
     changeAmount: 0.3,
-    volume: 1000000
+    volume: 1000000,
   }
 }
 

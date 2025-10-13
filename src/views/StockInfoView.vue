@@ -1,7 +1,10 @@
 <template>
   <div class="stock-info-view">
     <div class="header">
-      <h1>{{ stockInfo?.stock_name }} ({{ stockInfo?.stock_code }})</h1>
+      <div class="title-container">
+        <h1>{{ stockInfo?.stock_name }} ({{ stockInfo?.stock_code }})</h1>
+        <el-button type="primary" class="trade-button" @click="handleTradeClick">交易</el-button>
+      </div>
       <div class="stock-basic-info">
         <div class="basic-details">
           <div class="detail-item">
@@ -114,13 +117,23 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { StockBasicInfoResponse, Executive, ExecutiveTransaction, Event, Shareholder, Dividend } from '@/types'
+import type {
+  StockBasicInfoResponse,
+  Executive,
+  ExecutiveTransaction,
+  Event,
+  Shareholder,
+  Dividend,
+} from '@/types'
 import { marketAPI, stockAPI } from '@/services/api'
+import { useStockStore } from '@/stores/stock'
 
-const route = useRoute()
-const stockId = ref(parseInt(route.params.id as string))
+const router = useRouter()
+const stockStore = useStockStore()
+
+const stockId = ref(stockStore.stockId)
 function mapExecutiveChangeType(type: string) {
   switch (type) {
     case 'BUY':
@@ -143,7 +156,7 @@ const rawExecutiveTransactions = ref<ExecutiveTransaction[]>([])
 const executiveTransactions = computed(() => {
   return rawExecutiveTransactions.value.map(transaction => ({
     ...transaction,
-    change_type: mapExecutiveChangeType(transaction.change_type)
+    change_type: mapExecutiveChangeType(transaction.change_type),
   }))
 })
 const events = ref<Event[]>([])
@@ -157,13 +170,16 @@ const loading = ref({
   executiveTransactions: false,
   events: false,
   shareholders: false,
-  dividends: false
+  dividends: false,
 })
 
 // 获取股票基本信息
 const fetchStockInfo = async () => {
   loading.value.stockInfo = true
   try {
+    if (!stockId.value) {
+      throw new Error('股票ID不存在')
+    }
     stockInfo.value = await marketAPI.getStockBasicInfo({ id: stockId.value })
   } catch (error) {
     ElMessage.error('获取股票信息失败')
@@ -192,11 +208,10 @@ const fetchExecutiveTransactions = async () => {
   try {
     // const endDate = new Date().toISOString().split('T')[0]
     // const startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
     rawExecutiveTransactions.value = await stockAPI.getExecutiveTransactions({
       stock_id: stockId.value,
       start_date: null,
-      end_date: null
+      end_date: null,
     })
   } catch (error) {
     ElMessage.error('获取高管交易记录失败')
@@ -238,7 +253,7 @@ const fetchDividends = async () => {
   try {
     dividends.value = await stockAPI.getDividends({
       stock_id: stockId.value,
-      year: null
+      year: null,
     })
   } catch (error) {
     ElMessage.error('获取分红信息失败')
@@ -249,7 +264,7 @@ const fetchDividends = async () => {
 }
 
 // 根据激活的标签页加载对应数据
-watch(activeTab, (newTab) => {
+watch(activeTab, newTab => {
   switch (newTab) {
     case 'executives':
       if (executives.value.length === 0) {
@@ -283,6 +298,12 @@ onMounted(() => {
   fetchStockInfo()
   fetchExecutives()
 })
+// 处理交易按钮点击事件
+const handleTradeClick = () => {
+  stockStore.setStockCode(stockInfo.value?.stock_code || '')
+  stockStore.setStockId(stockId.value || 0)
+  router.push(`/trade`)
+}
 </script>
 
 <style scoped>
@@ -356,9 +377,18 @@ onMounted(() => {
   padding: 20px 0;
 }
 
-
-
 .el-table {
   margin-top: 10px;
+}
+
+.title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-container button {
+  width: 120px;
+  height: 40px;
 }
 </style>

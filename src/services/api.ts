@@ -1,7 +1,25 @@
-import '../types'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
-import type { AuthedResponse, CategoriesRequest, CategoriesResponse, Dividend, Executive, ExecutiveTransaction, MarketOverviewRequest, MarketOverviewResponse, Shareholder, StockBasicInfoRequest, StockBasicInfoResponse, UserData, Event } from '../types'
+import type {
+  AuthedResponse,
+  CategoriesRequest,
+  CategoriesResponse,
+  Dividend,
+  Executive,
+  ExecutiveTransaction,
+  MarketOverviewRequest,
+  MarketOverviewResponse,
+  Shareholder,
+  StockBasicInfoRequest,
+  StockBasicInfoResponse,
+  UserData,
+  Event,
+  TradeRequest,
+  TradeResponse,
+  HoldingsResponse,
+  AnalyzeResponse,
+  OrdersResponse,
+} from '../types'
 import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 
 // 基础API配置
@@ -16,22 +34,20 @@ const apiClient = axios.create({
 })
 
 // 请求拦截器 - 添加认证头部
-apiClient.interceptors.request.use(
-  (config) => {
-    const userStore = useUserStore()
-    if (userStore.isLoggedIn && userStore.token) {
-      config.headers.Authorization = `Bearer ${userStore.token}`
-    }
-    return config
+apiClient.interceptors.request.use(config => {
+  const userStore = useUserStore()
+  if (userStore.isLoggedIn && userStore.token) {
+    config.headers.Authorization = `Bearer ${userStore.token}`
   }
-)
+  return config
+})
 
 // 响应拦截器 - 统一处理错误
 apiClient.interceptors.response.use(
-  (response) => {
+  response => {
     return response.data
   },
-  (error) => {
+  error => {
     console.error('API request failed:', error)
     throw error
   }
@@ -70,9 +86,6 @@ async function post(endpoint: string, options: any = {}) {
       method: 'POST',
       ...options,
     })
-    if (!response.success) {
-      throw new Error(response.message || 'POST request failed')
-    }
     console.debug('POST request response:', response)
     return response
   } catch (error) {
@@ -88,29 +101,29 @@ export const authAPI = {
     const response = await post('/api/login', {
       body: JSON.stringify({ username, password }),
     })
-    
+
     if (response.success && response.data.token) {
       const userStore = useUserStore()
       userStore.login(response.data.token, response.data.user)
       console.log('Login successful', userStore.user)
     }
-    
+
     return response
   },
 
   // 用户注册
   async register(username: string, password: string): Promise<AuthedResponse<null>> {
-    const response = await post('/api/register', {
+    const response = (await post('/api/register', {
       body: JSON.stringify({ username, password, confirmPassword: password }),
-    }) as AuthedResponse<null>
-    
+    })) as AuthedResponse<null>
+
     return response
   },
 
   // 用户登出
   async logout() {
     const response = await post('/auth/logout')
-    
+
     const userStore = useUserStore()
     userStore.logout()
     return response
@@ -120,15 +133,13 @@ export const authAPI = {
 // 交易相关API
 export const tradeAPI = {
   // 执行交易
-  async trade(stock_id: number, quantity: number, price: number, type: 'BUY' | 'SELL'): Promise<AuthedResponse<number>> {
+  async trade(form: TradeRequest): Promise<TradeResponse> {
     return post('/auth/trade', {
-      body: JSON.stringify({
-        stock_id,
-        quantity,
-        price,
-        type,
-      }),
+      body: JSON.stringify(form),
     })
+  },
+  async getOrder(): Promise<OrdersResponse> {
+    return get('/auth/user/orders')
   },
 }
 
@@ -160,7 +171,7 @@ export const stockAPI = {
   // 获取高管交易记录
   async getExecutiveTransactions(params: DateQueryParam): Promise<ExecutiveTransaction[]> {
     return get(`./api/stock/executive-transactions`, {
-      params, 
+      params,
     })
   },
 
@@ -195,15 +206,29 @@ export const categoryAPI = {
   },
 }
 
+// 用户持仓相关API
+export const holdingsAPI = {
+  // 获取用户持仓列表
+  async getHoldings(): Promise<HoldingsResponse> {
+    return get('/auth/user/holdings')
+  },
+
+  // 获取用户持仓分析
+  async getAnalyze(): Promise<AnalyzeResponse> {
+    return get('/auth/user/analyze')
+  },
+}
+
 export default {
   auth: authAPI,
   trade: tradeAPI,
   market: marketAPI,
   stock: stockAPI,
   category: categoryAPI,
+  holdings: holdingsAPI,
   client: {
     apiRequest,
     get,
     post,
-  }
+  },
 }

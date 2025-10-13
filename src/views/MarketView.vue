@@ -3,13 +3,22 @@
     <div class="header">
       <h1>大盘行情</h1>
       <div class="market-tabs">
-        <button :class="{ active: activeTab === 'sh' }" @click="activeTab = 'sh'; fetchMarketData()">
+        <button
+          :class="{ active: activeTab === 'sh' }"
+          @click="((activeTab = 'sh'), fetchMarketData())"
+        >
           沪市 (6开头)
         </button>
-        <button :class="{ active: activeTab === 'sz' }" @click="activeTab = 'sz'; fetchMarketData()">
+        <button
+          :class="{ active: activeTab === 'sz' }"
+          @click="((activeTab = 'sz'), fetchMarketData())"
+        >
           深市 (0开头)
         </button>
-        <button :class="{ active: activeTab === 'cyb' }" @click="activeTab = 'cyb'; fetchMarketData()">
+        <button
+          :class="{ active: activeTab === 'cyb' }"
+          @click="((activeTab = 'cyb'), fetchMarketData())"
+        >
           创业板 (3开头)
         </button>
       </div>
@@ -34,8 +43,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="stock in stocks" :key="stock.stock_id" @click="$router.push(`/stock/${stock.stock_id}/info`)"
-            class="stock-row">
+          <tr
+            v-for="stock in stocks"
+            :key="stock.stock_id"
+            @click="handleStockClick(stock)"
+            class="stock-row"
+          >
             <td>{{ stock.stock_code }}</td>
             <td>{{ stock.stock_name }}</td>
             <td>{{ stock.open_price }}</td>
@@ -65,6 +78,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { MarketOverviewResponse as Stock } from '@/types/index'
 import { marketAPI } from '@/services/api'
+import { useStockStore } from '@/stores/stock'
+import router from '@/router'
 
 const activeTab = ref<'sh' | 'sz' | 'cyb'>('sh')
 const stocks = ref<Stock[]>([])
@@ -84,6 +99,13 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(intervalId)
 })
+
+const stockStore = useStockStore()
+// 处理股票点击事件
+const handleStockClick = (stock: Stock) => {
+  stockStore.setStockId(stock.stock_id)
+  router.push(`/stock/info`)
+}
 </script>
 
 <style scoped>

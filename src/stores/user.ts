@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null)
 
   // 计算属性
-  const isLoggedIn = computed(() => token.value !== null && user.value !== null)
+  const isLoggedIn = computed(() => token.value !== null)
   const username = computed(() => user.value?.username || '')
   const balance = computed(() => user.value?.balance || 0)
   const userId = computed(() => user.value?.user_id || 0)
@@ -54,6 +54,6 @@ export const useUserStore = defineStore('user', () => {
     setUser,
     login,
     logout,
-    updateBalance
+    updateBalance,
   }
 })

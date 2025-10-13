@@ -19,11 +19,6 @@ const goHome = () => {
   router.push('/')
 }
 
-const forceUpdate = () => {
-  // 强制刷新当前路由
-  // router.go(0)
-}
-
 const handleLogout = async () => {
   try {
     loading.value = true
@@ -64,19 +59,19 @@ const handleLogout = async () => {
         <div class="header-content">
           <h1 @click="goHome" class="app-title">股票交易系统</h1>
           <nav class="nav-links">
-            <!-- <router-link to="/stocks" @click="forceUpdate">股票行情</router-link> -->
+            <router-link to="/market">股票行情</router-link>
 
             <!-- 登录用户专属菜单 -->
             <template v-if="isLoggedIn">
-              <router-link to="/trade" @click="forceUpdate">交易</router-link>
-              <router-link to="/portfolio" @click="forceUpdate">我的持仓</router-link>
-              <router-link to="/trade/record" @click="forceUpdate">交易记录</router-link>
+              <router-link to="/trade">交易</router-link>
+              <router-link to="/portfolio">我的持仓</router-link>
+              <router-link to="/transactions">交易记录</router-link>
             </template>
 
             <!-- 游客菜单 -->
             <template v-else>
-              <router-link to="/register" @click="forceUpdate">注册</router-link>
-              <router-link to="/login" @click="forceUpdate">登录</router-link>
+              <router-link to="/register">注册</router-link>
+              <router-link to="/login">登录</router-link>
             </template>
 
             <!-- 登录用户信息 -->
@@ -138,8 +133,13 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 应用内容 */
@@ -152,7 +152,7 @@ body {
   background: linear-gradient(135deg, #1890ff, #096dd9);
   color: white;
   padding: 1rem 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -191,11 +191,11 @@ body {
 }
 
 .nav-links a:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-links a.router-link-active {
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 用户信息样式 */
@@ -212,7 +212,7 @@ body {
 }
 
 .logout-link {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   padding: 0.3rem 0.8rem;
   border-radius: 4px;
   font-size: 0.85rem;
@@ -221,7 +221,7 @@ body {
 }
 
 .logout-link:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* 主内容 */
@@ -237,12 +237,12 @@ body {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .nav-links {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .user-info {
     margin-left: 0;
     justify-content: center;

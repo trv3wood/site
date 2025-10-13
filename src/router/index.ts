@@ -17,27 +17,27 @@ const router = createRouter({
     // 公共路由
     {
       path: '/',
-      redirect: '/market'
+      redirect: '/market',
     },
     {
       path: '/market',
       name: 'market',
       component: () => import('@/views/MarketView.vue'),
-      meta: { title: '大盘行情' }
+      meta: { title: '大盘行情' },
     },
     // {
-    //   path: '/stock/:code/realtime',
+    //   path: '/stock/realtime',
     //   name: 'stock-realtime',
     //   component: () => import('@/views/StockRealtimeView.vue'),
     //   props: true,
     //   meta: { title: '实时行情' }
     // },
     {
-      path: '/stock/:id/info',
+      path: '/stock/info',
       name: 'stock-info',
       component: () => import('@/views/StockInfoView.vue'),
       props: true,
-      meta: { title: '个股信息' }
+      meta: { title: '个股信息' },
     },
 
     // 游客专属路由
@@ -45,45 +45,38 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { title: '用户登录' }
+      meta: { title: '用户登录' },
     },
     {
       path: '/register',
       name: 'register',
       component: () => import('@/views/RegisterView.vue'),
-      meta: { title: '用户注册' }
+      meta: { title: '用户注册' },
     },
 
     // 登录用户专属路由
-    // {
-    //   path: '/dashboard',
-    //   name: 'dashboard',
-    //   component: () => import('@/views/DashboardView.vue'),
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '用户主页' }
-    // },
     {
-      path: '/trade/:code',
+      path: '/trade',
       name: 'trade',
       component: () => import('@/views/TradeView.vue'),
       props: true,
       beforeEnter: requireAuth,
-      meta: { title: '股票交易' }
+      meta: { title: '股票交易' },
     },
-    // {
-    //   path: '/portfolio',
-    //   name: 'portfolio',
-    //   component: () => import('@/views/PortfolioView.vue'),
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '我的持仓' }
-    // },
-    // {
-    //   path: '/transactions',
-    //   name: 'transactions',
-    //   component: () => import('@/views/TransactionsView.vue'),
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '交易记录' }
-    // },
+    {
+      path: '/portfolio',
+      name: 'portfolio',
+      component: () => import('@/views/PortfolioView.vue'),
+      beforeEnter: requireAuth,
+      meta: { title: '我的持仓' },
+    },
+    {
+      path: '/transactions',
+      name: 'transactions',
+      component: () => import('@/views/TransactionsView.vue'),
+      beforeEnter: requireAuth,
+      meta: { title: '交易记录' },
+    },
     // {
     //   path: '/analysis',
     //   name: 'analysis',
@@ -92,7 +85,7 @@ const router = createRouter({
     //   meta: { title: '账户分析' }
     // },
     // {
-    //   path: '/stock-analysis/:code',
+    //   path: '/stock-analysis',
     //   name: 'stock-analysis',
     //   component: () => import('@/views/StockAnalysisView.vue'),
     //   props: true,
