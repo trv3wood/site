@@ -174,3 +174,11 @@ export interface DateQueryParam {
   start_date: string | null;
   end_date: string | null;
 }
+export interface TradeRequest {
+  order_type: "SELL" | "BUY";
+  price: number;
+  quantity: number;
+  stock_id: number;
+  [property: string]: any;
+}
+export type TradeResponse = AuthedResponse<number>

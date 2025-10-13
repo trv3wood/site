@@ -11,15 +11,6 @@ const requireAuth = (to: any, from: any, next: any) => {
   }
 }
 
-const requireGuest = (to: any, from: any, next: any) => {
-  const userStore = useUserStore()
-  if (userStore.isLoggedIn) {
-    next('/dashboard')
-  } else {
-    next()
-  }
-}
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -54,14 +45,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      beforeEnter: requireGuest,
       meta: { title: '用户登录' }
     },
     {
       path: '/register',
       name: 'register',
       component: () => import('@/views/RegisterView.vue'),
-      beforeEnter: requireGuest,
       meta: { title: '用户注册' }
     },
 
@@ -73,14 +62,14 @@ const router = createRouter({
     //   beforeEnter: requireAuth,
     //   meta: { title: '用户主页' }
     // },
-    // {
-    //   path: '/trade/:code',
-    //   name: 'trade',
-    //   component: () => import('@/views/TradeView.vue'),
-    //   props: true,
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '股票交易' }
-    // },
+    {
+      path: '/trade/:code',
+      name: 'trade',
+      component: () => import('@/views/TradeView.vue'),
+      props: true,
+      beforeEnter: requireAuth,
+      meta: { title: '股票交易' }
+    },
     // {
     //   path: '/portfolio',
     //   name: 'portfolio',
