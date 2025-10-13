@@ -105,68 +105,145 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.portfolio-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+.portfolio-view {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.analyze-section {
-  margin-bottom: 20px;
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
 }
 
-.analyze-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.page-header h2 {
+    color: #333;
+    margin: 0;
 }
 
-.analyze-content {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+.header-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
 
-.analyze-item {
-  text-align: center;
+.refresh-timer {
+    color: #666;
+    font-size: 14px;
 }
 
-.analyze-item .label {
-  display: block;
-  font-size: 14px;
-  opacity: 0.8;
-  margin-bottom: 8px;
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
 }
 
-.analyze-item .value {
-  display: block;
-  font-size: 24px;
-  font-weight: bold;
+.trade-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #4dabf7;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.holdings-table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
 }
 
-.holdings-section {
-  margin-top: 20px;
+.holdings-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.profit {
-  color: #f56c6c;
+.holdings-table th,
+.holdings-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
 }
 
-.loss {
-  color: #67c23a;
+.holdings-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
 }
 
-:deep(.el-table) {
-  margin-top: 10px;
+.holdings-table tbody tr:hover {
+    background: #f8f9fa;
 }
 
-:deep(.el-table th) {
-  background-color: #f5f7fa;
-  font-weight: 600;
+.positive {
+    color: #f03e3e;
+    font-weight: 600;
+}
+
+.negative {
+    color: #51cf66;
+    font-weight: 600;
+}
+
+.portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px; /* 新增 */
+}
+
+.summary-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+    margin: 0 0 10px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.total-amount {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.total-profit,
+.total-rate {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .holdings-table-container {
+        overflow-x: auto;
+    }
+
+    .holdings-table {
+        min-width: 800px;
+    }
+
+    .portfolio-summary {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

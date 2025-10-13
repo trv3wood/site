@@ -1,3 +1,157 @@
+
+<style scoped>
+/* 样式与之前相同 */
+.trade-view {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.page-header h2 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #666;
+}
+
+.trade-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stock-selector {
+  margin-bottom: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.stock-select,
+.form-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.stock-info {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4dabf7;
+}
+
+.price-info {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.positive {
+  color: #f03e3e;
+}
+
+.negative {
+  color: #51cf66;
+}
+
+.trade-type {
+  display: flex;
+  gap: 10px;
+}
+
+.type-btn {
+  padding: 10px 20px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.type-btn.active {
+  border-color: #4dabf7;
+  background: #4dabf7;
+  color: white;
+}
+
+.error-message {
+  color: #fa5252;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.trade-summary {
+  padding: 15px;
+  background: #e7f5ff;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.trade-summary p {
+  margin: 5px 0;
+}
+
+.submit-btn {
+  padding: 15px;
+  background: #4dabf7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #339af0;
+}
+
+.trade-result {
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.trade-result.success {
+  background: #d3f9d8;
+  color: #2b8a3e;
+  border: 1px solid #51cf66;
+}
+
+.trade-result.error {
+  background: #ffe3e3;
+  color: #c92a2a;
+  border: 1px solid #ff6b6b;
+}
+</style>
 <template>
   <div class="trade-container">
     <h1>股票交易</h1>
@@ -82,4 +236,3 @@ function resetForm() {
   }
 }
 </script>
-<style lang="css" scoped></style>

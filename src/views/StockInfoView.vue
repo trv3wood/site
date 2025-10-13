@@ -1,153 +1,253 @@
 <template>
   <div class="stock-info-view">
     <div class="header">
-      <div class="title-container">
-        <h1>{{ stockInfo?.stock_name }} ({{ stockInfo?.stock_code }})</h1>
-        <el-button type="primary" class="trade-button" @click="handleTradeClick">交易</el-button>
-      </div>
+      <h1>{{ stockInfo?.stock_name }} ({{ stockInfo?.stock_code }})</h1>
       <div class="stock-basic-info">
         <div class="basic-details">
           <div class="detail-item">
             <span class="label">股票代码:</span>
             <span class="value">{{ stockInfo?.stock_code }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">股票名称:</span>
-            <span class="value">{{ stockInfo?.stock_name }}</span>
+          <div class="card-content">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">股票代码</span>
+                <span class="value">{{ stockInfo?.stock_code }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">股票名称</span>
+                <span class="value">{{ stockInfo?.stock_name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">总股本</span>
+                <span class="value">{{ formatNumber(stockInfo?.total_shares) }}股</span>
+              </div>
+              <div class="info-item">
+                <span class="label">股东人数</span>
+                <span class="value">{{ formatNumber(stockInfo?.shareholder_count) }}人</span>
+              </div>
+            </div>
           </div>
-          <div class="detail-item">
-            <span class="label">市盈率:</span>
-            <span class="value">{{ stockInfo?.pe_ratio }}</span>
+        </div>
+
+        <!-- 财务指标卡片 -->
+        <div class="info-card">
+          <div class="card-header">
+            <h3>财务指标</h3>
           </div>
-          <div class="detail-item">
-            <span class="label">市净率:</span>
-            <span class="value">{{ stockInfo?.pb_ratio }}</span>
+          <div class="card-content">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">市盈率(PE)</span>
+                <span class="value" :class="getRatioClass(stockInfo?.pe_ratio)">{{ stockInfo?.pe_ratio || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">市净率(PB)</span>
+                <span class="value" :class="getRatioClass(stockInfo?.pb_ratio)">{{ stockInfo?.pb_ratio || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">每股收益</span>
+                <span class="value">{{ stockInfo?.eps ? `¥${stockInfo.eps}` : '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">每股净资产</span>
+                <span class="value">{{ stockInfo?.navps ? `¥${stockInfo.navps}` : '-' }}</span>
+              </div>
+            </div>
           </div>
-          <div class="detail-item">
-            <span class="label">每股收益:</span>
-            <span class="value">{{ stockInfo?.eps }}</span>
+        </div>
+
+        <!-- 行业概念卡片 -->
+        <div class="info-card">
+          <div class="card-header">
+            <h3>行业概念</h3>
           </div>
-          <div class="detail-item">
-            <span class="label">每股净资产:</span>
-            <span class="value">{{ stockInfo?.navps }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">总股本:</span>
-            <span class="value">{{ stockInfo?.total_shares }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">股东人数:</span>
-            <span class="value">{{ stockInfo?.shareholder_count }}</span>
+          <div class="card-content">
+            <div class="categories-section">
+              <div class="category-group">
+                <h4>所属行业</h4>
+                <div class="tags">
+                  <span v-for="industry in industries" :key="industry.industry_id" class="tag industry-tag">
+                    {{ industry.industry_name }}
+                  </span>
+                  <span v-if="industries.length === 0" class="no-data">暂无数据</span>
+                </div>
+              </div>
+              <div class="category-group">
+                <h4>所属概念</h4>
+                <div class="tags">
+                  <span v-for="concept in concepts" :key="concept.concept_id" class="tag concept-tag">
+                    {{ concept.concept_name }}
+                  </span>
+                  <span v-if="concepts.length === 0" class="no-data">暂无数据</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="tabs-section">
-      <el-tabs v-model="activeTab" type="border-card">
-        <el-tab-pane label="高管信息" name="executives">
-          <div class="tab-content">
-            <el-table :data="executives" v-loading="loading.executives">
-              <el-table-column prop="executive_name" label="姓名"></el-table-column>
-              <el-table-column prop="position" label="职位"></el-table-column>
-              <el-table-column prop="share_quantity" label="持股数量"></el-table-column>
-              <el-table-column prop="salary" label="年薪">
-                <template #default="{ row }">
-                  {{ row.salary ? row.salary + '万' : '-' }}
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </el-tab-pane>
+      <!-- 标签页内容 -->
+      <div class="tabs-section">
+        <div class="tabs-header">
+          <button 
+            v-for="tab in tabs" 
+            :key="tab.name"
+            :class="['tab-btn', { active: activeTab === tab.name }]"
+            @click="activeTab = tab.name"
+          >
+            {{ tab.label }}
+            <span class="badge" v-if="getTabCount(tab.name) > 0">{{ getTabCount(tab.name) }}</span>
+          </button>
+        </div>
 
-        <el-tab-pane label="高管交易" name="executive-transactions">
-          <div class="tab-content">
-            <el-table :data="executiveTransactions" v-loading="loading.executiveTransactions">
-              <el-table-column prop="executive_name" label="高管姓名"></el-table-column>
-              <el-table-column prop="change_quantity" label="变更数量"></el-table-column>
-              <el-table-column prop="change_type" label="交易类型"></el-table-column>
-              <el-table-column prop="change_date" label="交易日期"></el-table-column>
-              <el-table-column prop="after_change_quantity" label="数量">
-                <template #default="{ row }">
-                  {{ row.after_change_quantity ? row.after_change_quantity + '股' : '-' }}
-                </template>
-              </el-table-column>
-            </el-table>
+        <div class="tab-content">
+          <!-- 高管信息 -->
+          <div v-show="activeTab === 'executives'" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>姓名</th>
+                    <th>职位</th>
+                    <th>持股数量</th>
+                    <th>年薪</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="executive in executives" :key="executive.executive_id">
+                    <td>{{ executive.executive_name }}</td>
+                    <td>{{ executive.position }}</td>
+                    <td>{{ formatNumber(executive.share_quantity) }}股</td>
+                    <td>{{ executive.salary ? `${executive.salary}万元` : '-' }}</td>
+                  </tr>
+                  <tr v-if="executives.length === 0">
+                    <td colspan="4" class="no-data">暂无高管信息</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </el-tab-pane>
 
-        <el-tab-pane label="公司事件" name="events">
-          <div class="tab-content">
-            <el-table :data="events" v-loading="loading.events">
-              <el-table-column prop="event_date" label="事件日期"></el-table-column>
-              <el-table-column prop="event_type" label="事件类型"></el-table-column>
-              <el-table-column prop="event_content" label="事件描述"></el-table-column>
-            </el-table>
+          <!-- 高管持股变动 -->
+          <div v-show="activeTab === 'executive-transactions'" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>高管姓名</th>
+                    <th>交易日期</th>
+                    <th>变动类型</th>
+                    <th>变动数量</th>
+                    <th>变动后持股</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="transaction in executiveTransactions">
+                    <td>{{ transaction.executive_name }}</td>
+                    <td>{{ formatDate(transaction.change_date) }}</td>
+                    <td>
+                      <span :class="['change-type', transaction.change_type]">
+                        {{ mapExecutiveChangeType(transaction.change_type) }}
+                      </span>
+                    </td>
+                    <td :class="getChangeClass(transaction.change_quantity)">
+                      {{ transaction.change_quantity > 0 ? '+' : '' }}{{ formatNumber(transaction.change_quantity) }}股
+                    </td>
+                    <td>{{ formatNumber(transaction.after_change_quantity) }}股</td>
+                  </tr>
+                  <tr v-if="executiveTransactions.length === 0">
+                    <td colspan="5" class="no-data">暂无高管持股变动记录</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </el-tab-pane>
 
-        <el-tab-pane label="股东信息" name="shareholders">
-          <div class="tab-content">
-            <el-table :data="shareholders" v-loading="loading.shareholders">
-              <el-table-column prop="shareholder_name" label="股东名称"></el-table-column>
-              <el-table-column prop="proportion" label="持股比例"></el-table-column>
-              <el-table-column prop="share_quantity" label="持股数量">
-                <template #default="{ row }">
-                  {{ row.share_quantity ? row.share_quantity + '股' : '-' }}
-                </template>
-              </el-table-column>
-            </el-table>
+          <!-- 公司大事记 -->
+          <div v-show="activeTab === 'events'" class="tab-pane">
+            <div class="events-timeline">
+              <div v-for="event in sortedEvents" :key="event.event_id" class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <div class="event-date">{{ formatDate(event.event_date) }}</div>
+                  <div class="event-type">{{ event.event_type }}</div>
+                  <div class="event-content">{{ event.event_content }}</div>
+                </div>
+              </div>
+              <div v-if="events.length === 0" class="no-data">暂无公司事件</div>
+            </div>
           </div>
-        </el-tab-pane>
 
-        <el-tab-pane label="分红信息" name="dividends">
-          <div class="tab-content">
-            <el-table :data="dividends" v-loading="loading.dividends">
-              <el-table-column prop="announcement_date" label="分红年份"></el-table-column>
-              <el-table-column prop="ex_dividend_date" label="除权除息日期"></el-table-column>
-              <el-table-column prop="payment_date" label="支付日期"></el-table-column>
-              <el-table-column prop="plan" label="分红计划"></el-table-column>
-            </el-table>
+          <!-- 股东信息 -->
+          <div v-show="activeTab === 'shareholders'" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>股东名称</th>
+                    <th>持股比例</th>
+                    <th>持股数量</th>
+                    <th>更新日期</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="shareholder in topShareholders" :key="shareholder.shareholder_id">
+                    <td>{{ shareholder.shareholder_name }}</td>
+                    <td>{{ (shareholder.proportion * 100).toFixed(2) }}%</td>
+                    <td>{{ formatNumber(shareholder.share_quantity) }}股</td>
+                    <td>{{ formatDate(shareholder.update_time) }}</td>
+                  </tr>
+                  <tr v-if="shareholders.length === 0">
+                    <td colspan="4" class="no-data">暂无股东信息</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </el-tab-pane>
-      </el-tabs>
+
+          <!-- 分红信息 -->
+          <div v-show="activeTab === 'dividends'" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>分红方案</th>
+                    <th>公告日期</th>
+                    <th>除权除息日</th>
+                    <th>派息日</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="dividend in dividends" :key="dividend.dividend_id">
+                    <td class="dividend-plan">{{ dividend.plan }}</td>
+                    <td>{{ formatDate(dividend.announcement_date) }}</td>
+                    <td>{{ formatDate(dividend.ex_dividend_date) }}</td>
+                    <td>{{ formatDate(dividend.payment_date) }}</td>
+                  </tr>
+                  <tr v-if="dividends.length === 0">
+                    <td colspan="4" class="no-data">暂无分红信息</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type {
-  StockBasicInfoResponse,
-  Executive,
-  ExecutiveTransaction,
-  Event,
-  Shareholder,
-  Dividend,
-} from '@/types'
+import type { StockBasicInfoResponse, Executive, ExecutiveTransaction, Event, Shareholder, Dividend, Concept, Industry } from '@/types'
 import { marketAPI, stockAPI } from '@/services/api'
 import { useStockStore } from '@/stores/stock'
 
-const router = useRouter()
-const stockStore = useStockStore()
-
-const stockId = ref(stockStore.stockId)
-function mapExecutiveChangeType(type: string) {
-  switch (type) {
-    case 'BUY':
-      return '购买'
-    case 'SELL':
-      return '卖出'
-    case 'BONUS':
-      return '分红'
-    case 'OTHER':
-      return '其他'
-    default:
-      return type
-  }
-}
+const route = useRoute()
+const stockId = ref(parseInt(route.params.id as string))
 
 // 响应式数据
 const stockInfo = ref<StockBasicInfoResponse | null>(null)
@@ -156,12 +256,14 @@ const rawExecutiveTransactions = ref<ExecutiveTransaction[]>([])
 const executiveTransactions = computed(() => {
   return rawExecutiveTransactions.value.map(transaction => ({
     ...transaction,
-    change_type: mapExecutiveChangeType(transaction.change_type),
+    change_type: mapExecutiveChangeType(transaction.change_type)
   }))
 })
 const events = ref<Event[]>([])
 const shareholders = ref<Shareholder[]>([])
 const dividends = ref<Dividend[]>([])
+const concepts = ref<Concept[]>([])
+const industries = ref<Industry[]>([])
 
 const activeTab = ref('executives')
 const loading = ref({
@@ -170,10 +272,79 @@ const loading = ref({
   executiveTransactions: false,
   events: false,
   shareholders: false,
-  dividends: false,
+  dividends: false
 })
 
-// 获取股票基本信息
+// 标签页配置
+const tabs = [
+  { name: 'executives', label: '高管信息' },
+  { name: 'executive-transactions', label: '高管持股变动' },
+  { name: 'events', label: '公司大事记' },
+  { name: 'shareholders', label: '股东信息' },
+  { name: 'dividends', label: '分红信息' }
+]
+
+// 计算属性
+const sortedEvents = computed(() => {
+  return [...events.value].sort((a, b) => 
+    new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+  )
+})
+
+const topShareholders = computed(() => {
+  return shareholders.value
+    .sort((a, b) => b.proportion - a.proportion)
+    .slice(0, 10)
+})
+
+// 工具函数
+const mapExecutiveChangeType = (type: string) => {
+  const typeMap: { [key: string]: string } = {
+    'BUY': '增持',
+    'SELL': '减持',
+    'BONUS': '分红',
+    'OTHER': '其他'
+  }
+  return typeMap[type] || type
+}
+
+const formatNumber = (num: number | undefined): string => {
+  if (num === undefined || num === null) return '-'
+  if (num >= 100000000) {
+    return (num / 100000000).toFixed(2) + '亿'
+  } else if (num >= 10000) {
+    return (num / 10000).toFixed(2) + '万'
+  }
+  return num.toString()
+}
+
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('zh-CN')
+}
+
+const getRatioClass = (ratio: number | undefined): string => {
+  if (ratio === undefined) return ''
+  return ratio < 0 ? 'negative' : ratio > 50 ? 'high' : 'normal'
+}
+
+const getChangeClass = (change: number): string => {
+  return change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'
+}
+
+const getTabCount = (tabName: string): number => {
+  const counts: { [key: string]: number } = {
+    'executives': executives.value.length,
+    'executive-transactions': executiveTransactions.value.length,
+    'events': events.value.length,
+    'shareholders': shareholders.value.length,
+    'dividends': dividends.value.length
+  }
+  return counts[tabName] || 0
+}
+const router = useRouter()
+
+// API 调用函数
 const fetchStockInfo = async () => {
   loading.value.stockInfo = true
   try {
@@ -189,7 +360,6 @@ const fetchStockInfo = async () => {
   }
 }
 
-// 获取高管信息
 const fetchExecutives = async () => {
   loading.value.executives = true
   try {
@@ -202,12 +372,12 @@ const fetchExecutives = async () => {
   }
 }
 
-// 获取高管交易记录
 const fetchExecutiveTransactions = async () => {
   loading.value.executiveTransactions = true
   try {
     // const endDate = new Date().toISOString().split('T')[0]
     // const startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
     rawExecutiveTransactions.value = await stockAPI.getExecutiveTransactions({
       stock_id: stockId.value,
       start_date: null,
@@ -221,7 +391,6 @@ const fetchExecutiveTransactions = async () => {
   }
 }
 
-// 获取公司事件
 const fetchEvents = async () => {
   loading.value.events = true
   try {
@@ -234,7 +403,6 @@ const fetchEvents = async () => {
   }
 }
 
-// 获取股东信息
 const fetchShareholders = async () => {
   loading.value.shareholders = true
   try {
@@ -247,7 +415,6 @@ const fetchShareholders = async () => {
   }
 }
 
-// 获取分红信息
 const fetchDividends = async () => {
   loading.value.dividends = true
   try {
@@ -262,43 +429,48 @@ const fetchDividends = async () => {
     loading.value.dividends = false
   }
 }
+const fetchCategories = async () => {
+  loading.value.categories = true
+  try {
+    const response = await categoryAPI.getCategories({ stock_id: stockId.value })
+    concepts.value = response.concepts || []
+    industries.value = response.industries || []
+  } catch (error) {
+    console.error('Failed to fetch categories:', error)
+  } finally {
+    loading.value.categories = false
+  }
+}
 
 // 根据激活的标签页加载对应数据
-watch(activeTab, newTab => {
+watch(activeTab, (newTab) => {
   switch (newTab) {
     case 'executives':
-      if (executives.value.length === 0) {
-        fetchExecutives()
-      }
+      if (executives.value.length === 0) fetchExecutives()
       break
     case 'executive-transactions':
-      if (executiveTransactions.value.length === 0) {
-        fetchExecutiveTransactions()
-      }
+      if (executiveTransactions.value.length === 0) fetchExecutiveTransactions()
       break
     case 'events':
-      if (events.value.length === 0) {
-        fetchEvents()
-      }
+      if (events.value.length === 0) fetchEvents()
       break
     case 'shareholders':
-      if (shareholders.value.length === 0) {
-        fetchShareholders()
-      }
+      if (shareholders.value.length === 0) fetchShareholders()
       break
     case 'dividends':
-      if (dividends.value.length === 0) {
-        fetchDividends()
-      }
+      if (dividends.value.length === 0) fetchDividends()
       break
   }
 })
 
+// 初始化加载
 onMounted(() => {
   fetchStockInfo()
   fetchExecutives()
+  fetchCategories()
 })
 // 处理交易按钮点击事件
+const stockStore = useStockStore()
 const handleTradeClick = () => {
   stockStore.setStockCode(stockInfo.value?.stock_code || '')
   stockStore.setStockId(stockId.value || 0)
@@ -309,54 +481,142 @@ const handleTradeClick = () => {
 <style scoped>
 .stock-info-view {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-}
-
-.header {
-  margin-bottom: 30px;
-}
-
-.header h1 {
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.stock-basic-info {
   background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  min-height: 100vh;
 }
 
-.price-section {
+/* 加载样式 */
+.loading-container {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
+  height: 400px;
 }
 
-.current-price {
-  font-size: 32px;
-  font-weight: bold;
+.loading-spinner {
+  text-align: center;
 }
 
-.change-info {
-  font-size: 18px;
-  font-weight: bold;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e9ecef;
+  border-top: 3px solid #4dabf7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
 }
 
-.basic-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 股票头部 */
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.stock-title h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.stock-code {
+  font-size: 1.2rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
   gap: 15px;
 }
 
-.detail-item {
+.action-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trade-btn {
+  background: #4dabf7;
+  color: white;
+}
+
+.trade-btn:hover {
+  background: #339af0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+}
+
+/* 信息卡片 */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  padding: 20px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.info-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.info-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #e9ecef;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.info-item:last-child {
+  border-bottom: none;
 }
 
 .label {
@@ -366,16 +626,201 @@ const handleTradeClick = () => {
 
 .value {
   color: #333;
-  font-weight: bold;
+  font-weight: 600;
 }
 
+.value.positive {
+  color: #51cf66;
+}
+
+.value.negative {
+  color: #f03e3e;
+}
+
+.value.high {
+  color: #fab005;
+}
+
+/* 行业概念 */
+.categories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.category-group h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.industry-tag {
+  background: #e7f5ff;
+  color: #1971c2;
+  border: 1px solid #a5d8ff;
+}
+
+.concept-tag {
+  background: #fff0f6;
+  color: #a61e4d;
+  border: 1px solid #fcc2d7;
+}
+
+/* 标签页 */
 .tabs-section {
-  margin-top: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.tabs-header {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0 20px;
+}
+
+.tab-btn {
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  color: #4dabf7;
+  background: rgba(77, 171, 247, 0.05);
+}
+
+.tab-btn.active {
+  color: #4dabf7;
+  background: white;
+  border-bottom: 2px solid #4dabf7;
+}
+
+.badge {
+  background: #4dabf7;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .tab-content {
-  padding: 20px 0;
+  padding: 0;
 }
+
+.tab-pane {
+  padding: 0;
+}
+
+/* 表格样式 */
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background: #f8f9fa;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.data-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f3f4;
+  color: #333;
+}
+
+.data-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* 特殊样式 */
+.change-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.change-type.BUY {
+  background: #d3f9d8;
+  color: #2b8a3e;
+}
+
+.change-type.SELL {
+  background: #ffe3e3;
+  color: #c92a2a;
+}
+
+.change-type.BONUS {
+  background: #fff3bf;
+  color: #e67700;
+}
+
+.positive {
+  color: #51cf66;
+  font-weight: 600;
+}
+
+.negative {
+  color: #f03e3e;
+  font-weight: 600;
+}
+
+.neutral {
+  color: #868e96;
+}
+
+.dividend-plan {
+  font-weight: 600;
+  color: #e67700;
+}
+
+/* 时间线样式 */
+.events-timeline {
+  padding: 30px;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+
 
 .el-table {
   margin-top: 10px;

@@ -99,7 +99,7 @@ export const authAPI = {
   // 用户登录
   async login(username: string, password: string): Promise<AuthedResponse<UserData>> {
     const response = await post('/api/login', {
-      body: JSON.stringify({ username, password }),
+      data: { username, password },
     })
 
     if (response.success && response.data.token) {
@@ -163,7 +163,7 @@ export const marketAPI = {
 export const stockAPI = {
   // 获取高管信息
   async getExecutives(params: PageQueryParam): Promise<Executive[]> {
-    return get(`./api/stock/executives`, {
+    return get(`/api/stock/executives`, {
       params,
     })
   },

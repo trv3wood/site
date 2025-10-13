@@ -16,7 +16,7 @@ const userInfo = computed(() => userStore.user)
 
 // 方法
 const goHome = () => {
-  router.push('/')
+  router.push('/market')
 }
 
 const handleLogout = async () => {
@@ -24,7 +24,7 @@ const handleLogout = async () => {
     loading.value = true
     await api.auth.logout()
     userStore.logout()
-    router.push('/')
+    router.push('/market')
   } catch (error) {
     console.error('退出登录失败:', error)
   } finally {
@@ -77,7 +77,7 @@ const handleLogout = async () => {
             <!-- 登录用户信息 -->
             <div v-if="isLoggedIn" class="user-info">
               <span class="welcome-text">欢迎，{{ userInfo?.username || '用户' }}</span>
-              <a href="#" @click.prevent="handleLogout" class="logout-link">退出</a>
+              <button @click="handleLogout" class="auth-btn logout-btn">退出</button>
             </div>
           </nav>
         </div>
@@ -100,8 +100,8 @@ const handleLogout = async () => {
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #f8f9fa;
+  color: #495057;
 }
 
 /* 加载样式 */
@@ -111,11 +111,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  backdrop-filter: blur(10px);
 }
 
 .loading-spinner {
@@ -123,13 +124,13 @@ body {
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #1890ff;
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e9ecef;
+  border-top: 4px solid #4dabf7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
+  margin: 0 auto 15px;
 }
 
 @keyframes spin {
@@ -145,107 +146,236 @@ body {
 /* 应用内容 */
 .app-content {
   min-height: 100vh;
+  background: #f8f9fa;
 }
 
-/* 头部样式 */
+/* 头部样式 - 淡色系 */
 .app-header {
-  background: linear-gradient(135deg, #1890ff, #096dd9);
-  color: white;
-  padding: 1rem 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  color: #495057;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .header-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  height: 70px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
 .app-title {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: all 0.3s ease;
+  color: #495057;
+  margin: 0;
 }
 
 .app-title:hover {
-  opacity: 0.8;
+  transform: translateY(-2px);
+  color: #4dabf7;
 }
 
 .nav-links {
   display: flex;
-  gap: 2rem;
-  align-items: center;
+  gap: 8px;
 }
 
-.nav-links a {
-  color: white;
+.nav-link {
+  color: #495057;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: rgba(77, 171, 247, 0.1);
+  border-color: rgba(77, 171, 247, 0.3);
+  transform: translateY(-2px);
+}
+
+.nav-link.router-link-active {
+  background: rgba(77, 171, 247, 0.15);
+  border-color: rgba(77, 171, 247, 0.4);
+  color: #4dabf7;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 认证按钮样式 */
+.auth-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
 }
 
-.nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.login-btn {
+  background: transparent;
+  color: #4dabf7;
+  border: 1px solid #4dabf7;
 }
 
-.nav-links a.router-link-active {
-  background-color: rgba(255, 255, 255, 0.2);
+.login-btn:hover {
+  background: rgba(77, 171, 247, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.2);
+}
+
+.register-btn {
+  background: #4dabf7;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.register-btn:hover {
+  background: #339af0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+}
+
+/* 退出按钮改为协调的颜色 */
+.logout-btn {
+  background: #6c757d;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.logout-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 }
 
 /* 用户信息样式 */
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-left: 1rem;
+  gap: 15px;
 }
 
 .welcome-text {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.logout-link {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  transition: background-color 0.3s;
-  cursor: pointer;
-}
-
-.logout-link:hover {
-  background: rgba(255, 255, 255, 0.3);
+  font-size: 0.95rem;
+  color: #495057;
+  font-weight: 500;
 }
 
 /* 主内容 */
 .main-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
+  background: #f8f9fa;
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .header-content {
-    flex-direction: column;
-    gap: 1rem;
+    padding: 0 15px;
+  }
+  
+  .header-left {
+    gap: 20px;
   }
 
   .nav-links {
+    gap: 5px;
+  }
+  
+  .nav-link {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    height: auto;
+    padding: 15px;
+    gap: 15px;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+  }
+  
+  .app-title {
+    text-align: center;
+    font-size: 1.6rem;
+  }
+  
+  .nav-links {
+    justify-content: center;
     flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .header-right {
+    width: 100%;
     justify-content: center;
   }
 
   .user-info {
-    margin-left: 0;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .auth-btn {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-link {
+    width: 200px;
+    text-align: center;
+  }
+  
+  .header-right {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .auth-btn {
+    width: 200px;
   }
 }
 </style>
