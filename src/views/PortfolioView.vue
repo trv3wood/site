@@ -12,33 +12,33 @@
         </template>
 
         <el-table :data="holdings" v-loading="loading" empty-text="暂无持仓">
-          <el-table-column prop="stock_code" label="股票代码" width="120" />
-          <el-table-column prop="stock_name" label="股票名称" width="150" />
-          <el-table-column prop="quantity" label="持仓数量" width="120" align="right">
+          <el-table-column prop="stock_code" label="股票代码" />
+          <el-table-column prop="stock_name" label="股票名称" />
+          <el-table-column prop="quantity" label="持仓数量">
             <template #default="{ row }">
               {{ row.quantity.toLocaleString() }}
             </template>
           </el-table-column>
-          <el-table-column prop="avg_cost" label="平均成本" width="120" align="right">
+          <el-table-column prop="avg_cost" label="平均成本">
             <template #default="{ row }">
               {{ formatCurrency(row.avg_cost) }}
             </template>
           </el-table-column>
-          <el-table-column prop="profit" label="盈亏" width="120" align="right">
+          <el-table-column prop="profit" label="盈亏">
             <template #default="{ row }">
               <span :class="{ profit: row.profit > 0, loss: row.profit < 0 }">
                 {{ formatCurrency(row.profit) }}
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="profit_rate" label="收益率" width="120" align="right">
+          <el-table-column prop="profit_rate" label="收益率">
             <template #default="{ row }">
               <span :class="{ profit: row.profit_rate > 0, loss: row.profit_rate < 0 }">
-                {{ row.profit_rate }}%
+                {{ row.profit_rate }}
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120">
+          <el-table-column label="操作">
             <template #default="{ row }">
               <el-button link type="primary" @click="goToTrade(row)">交易</el-button>
             </template>
