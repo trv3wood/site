@@ -106,90 +106,90 @@ onMounted(() => {
 
 <style scoped>
 .portfolio-view {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
 .page-header h2 {
-    color: #333;
-    margin: 0;
+  color: #333;
+  margin: 0;
 }
 
 .header-info {
-    display: flex;
-    gap: 20px;
-    align-items: center;
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .refresh-timer {
-    color: #666;
-    font-size: 14px;
+  color: #666;
+  font-size: 14px;
 }
 
 .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
 }
 
 .trade-link {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #4dabf7;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #4dabf7;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
 }
 
 .holdings-table-container {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 }
 
 .holdings-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .holdings-table th,
 .holdings-table td {
-    padding: 15px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
 }
 
 .holdings-table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #333;
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
 }
 
 .holdings-table tbody tr:hover {
-    background: #f8f9fa;
+  background: #f8f9fa;
 }
 
 .positive {
-    color: #f03e3e;
-    font-weight: 600;
+  color: #f03e3e;
+  font-weight: 600;
 }
 
 .negative {
-    color: #51cf66;
-    font-weight: 600;
+  color: #51cf66;
+  font-weight: 600;
 }
 
 .portfolio-summary {
@@ -200,50 +200,50 @@ onMounted(() => {
 }
 
 .summary-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .summary-card h3 {
-    margin: 0 0 10px 0;
-    color: #666;
-    font-size: 14px;
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 14px;
 }
 
 .total-amount {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
 }
 
 .total-profit,
 .total-rate {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
+  .page-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
 
-    .holdings-table-container {
-        overflow-x: auto;
-    }
+  .holdings-table-container {
+    overflow-x: auto;
+  }
 
-    .holdings-table {
-        min-width: 800px;
-    }
+  .holdings-table {
+    min-width: 800px;
+  }
 
-    .portfolio-summary {
-        grid-template-columns: 1fr;
-    }
+  .portfolio-summary {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useStockStore } from '@/stores/stock'
 
 // 路由守卫
 const requireAuth = (to: any, from: any, next: any) => {

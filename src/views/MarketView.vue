@@ -5,22 +5,14 @@
       <div class="header-top">
         <h1 class="page-title">大盘行情</h1>
         <div class="market-tabs">
-          <button 
-            :class="{ active: activeTab === 'sh' }" 
-            @click="switchTab('sh')"
-            class="tab-btn"
-          >
+          <button :class="{ active: activeTab === 'sh' }" @click="switchTab('sh')" class="tab-btn">
             沪市 (6开头)
           </button>
-          <button 
-            :class="{ active: activeTab === 'sz' }" 
-            @click="switchTab('sz')"
-            class="tab-btn"
-          >
+          <button :class="{ active: activeTab === 'sz' }" @click="switchTab('sz')" class="tab-btn">
             深市 (3开头)
           </button>
-          <button 
-            :class="{ active: activeTab === 'cyb' }" 
+          <button
+            :class="{ active: activeTab === 'cyb' }"
             @click="switchTab('cyb')"
             class="tab-btn"
           >
@@ -56,7 +48,12 @@
             </div>
             <div class="refresh-options">
               <label for="refresh-interval" class="refresh-label">刷新间隔:</label>
-              <select id="refresh-interval" v-model="selectedInterval" @change="updateRefreshInterval" class="refresh-select">
+              <select
+                id="refresh-interval"
+                v-model="selectedInterval"
+                @change="updateRefreshInterval"
+                class="refresh-select"
+              >
                 <option value="3000">3秒</option>
                 <option value="5000">5秒</option>
                 <option value="10000">10秒</option>
@@ -87,9 +84,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="stock in stocks" 
-              :key="stock.stock_id" 
+            <tr
+              v-for="stock in stocks"
+              :key="stock.stock_id"
               @click="handleStockClick(stock)"
               class="stock-row"
             >
@@ -115,7 +112,7 @@
           </tbody>
         </table>
       </div>
-      
+
       <!-- 空状态 -->
       <div v-if="stocks.length === 0" class="empty-state">
         <div class="empty-icon">📊</div>
@@ -156,7 +153,7 @@ const formatNumber = (value: number, showSign: boolean = false): string => {
   if (value === null || value === undefined) return '-'
   const num = Number(value)
   if (isNaN(num)) return '-'
-  
+
   if (showSign) {
     return num > 0 ? `+${num.toFixed(2)}` : num.toFixed(2)
   }
@@ -174,7 +171,7 @@ const formatVolume = (volume: number): string => {
   if (volume === null || volume === undefined) return '-'
   const num = Number(volume)
   if (isNaN(num)) return '-'
-  
+
   if (num >= 100000000) {
     return (num / 100000000).toFixed(2) + '亿'
   } else if (num >= 10000) {
@@ -187,7 +184,7 @@ const formatTurnover = (turnover: number): string => {
   if (turnover === null || turnover === undefined) return '-'
   const num = Number(turnover)
   if (isNaN(num)) return '-'
-  
+
   if (num >= 100000000) {
     return (num / 100000000).toFixed(2) + '亿'
   } else if (num >= 10000) {
@@ -200,7 +197,7 @@ const formatMarketCap = (marketCap: number): string => {
   if (marketCap === null || marketCap === undefined) return '-'
   const num = Number(marketCap)
   if (isNaN(num)) return '-'
-  
+
   if (num >= 100000000) {
     return (num / 100000000).toFixed(2) + '亿'
   }
@@ -217,7 +214,7 @@ const getPriceColor = (changeRate: number): string => {
 const fetchMarketData = async () => {
   loading.value = true
   error.value = ''
-  
+
   try {
     const data = await marketAPI.getMarketOverview({ type: activeTab.value })
     stocks.value = data
@@ -237,14 +234,14 @@ const manualRefresh = () => {
 
 const updateRefreshInterval = () => {
   countdown.value = refreshIntervalSeconds.value
-  
+
   if (intervalId !== -1) {
     clearInterval(intervalId)
   }
   if (countdownIntervalId !== -1) {
     clearInterval(countdownIntervalId)
   }
-  
+
   setupTimers()
 }
 
@@ -252,7 +249,7 @@ const setupTimers = () => {
   intervalId = window.setInterval(() => {
     fetchMarketData()
   }, refreshIntervalMs.value)
-  
+
   countdownIntervalId = window.setInterval(() => {
     countdown.value--
     if (countdown.value <= 0) {
@@ -470,8 +467,12 @@ const handleStockClick = (stock: Stock) => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 错误状态样式 */
@@ -590,41 +591,41 @@ const handleStockClick = (stock: Stock) => {
   .market-view {
     padding: 15px;
   }
-  
+
   .header-top {
     flex-direction: column;
     gap: 15px;
     align-items: stretch;
   }
-  
+
   .page-title {
     text-align: center;
     font-size: 1.4rem;
   }
-  
+
   .market-tabs {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .table-info {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .refresh-controls {
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .refresh-options {
     flex-wrap: wrap;
     gap: 5px;
   }
-  
+
   .stock-table th,
   .stock-table td {
     padding: 10px 8px;
@@ -637,23 +638,24 @@ const handleStockClick = (stock: Stock) => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .tab-btn {
     width: 100%;
   }
-  
+
   .refresh-controls {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
   }
-  
+
   .refresh-options {
     flex-direction: column;
     gap: 8px;
   }
-  
-  .refresh-select, .action-btn {
+
+  .refresh-select,
+  .action-btn {
     width: 100%;
   }
 }

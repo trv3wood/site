@@ -1,9 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <button @click="goBack" class="back-btn">
-        ← 返回大盘行情
-      </button>
+      <button @click="goBack" class="back-btn">← 返回大盘行情</button>
       <h2>用户登录</h2>
       <el-form :model="form" :rules="rules" ref="loginForm" label-width="80px">
         <el-form-item label="用户名" prop="username">
@@ -13,7 +11,9 @@
           <el-input v-model="form.password" type="password" placeholder="请输入密码" />
         </el-form-item>
         <el-form-item class="button-group">
-          <el-button type="primary" @click="handleLogin" :loading="loading" class="submit-btn">登录</el-button>
+          <el-button type="primary" @click="handleLogin" :loading="loading" class="submit-btn"
+            >登录</el-button
+          >
           <el-button @click="$router.push('/register')" class="switch-btn">注册</el-button>
         </el-form-item>
       </el-form>

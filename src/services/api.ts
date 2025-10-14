@@ -200,7 +200,7 @@ export const stockAPI = {
 export const categoryAPI = {
   // 获取概念和行业分类
   async getCategories(params: CategoriesRequest): Promise<CategoriesResponse> {
-    return get('/api/categories', {
+    return get('/api/stock/categories', {
       params,
     })
   },

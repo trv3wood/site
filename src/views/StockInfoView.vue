@@ -2,12 +2,9 @@
   <div class="stock-info-view">
     <div class="header">
       <h1>{{ stockInfo?.stock_name }} ({{ stockInfo?.stock_code }})</h1>
+      <el-button type="primary" @click="handleTradeClick()">交易</el-button>
       <div class="stock-basic-info">
         <div class="basic-details">
-          <div class="detail-item">
-            <span class="label">股票代码:</span>
-            <span class="value">{{ stockInfo?.stock_code }}</span>
-          </div>
           <div class="card-content">
             <div class="info-grid">
               <div class="info-item">
@@ -39,11 +36,15 @@
             <div class="info-grid">
               <div class="info-item">
                 <span class="label">市盈率(PE)</span>
-                <span class="value" :class="getRatioClass(stockInfo?.pe_ratio)">{{ stockInfo?.pe_ratio || '-' }}</span>
+                <span class="value" :class="getRatioClass(stockInfo?.pe_ratio)">{{
+                  stockInfo?.pe_ratio || '-'
+                }}</span>
               </div>
               <div class="info-item">
                 <span class="label">市净率(PB)</span>
-                <span class="value" :class="getRatioClass(stockInfo?.pb_ratio)">{{ stockInfo?.pb_ratio || '-' }}</span>
+                <span class="value" :class="getRatioClass(stockInfo?.pb_ratio)">{{
+                  stockInfo?.pb_ratio || '-'
+                }}</span>
               </div>
               <div class="info-item">
                 <span class="label">每股收益</span>
@@ -67,7 +68,11 @@
               <div class="category-group">
                 <h4>所属行业</h4>
                 <div class="tags">
-                  <span v-for="industry in industries" :key="industry.industry_id" class="tag industry-tag">
+                  <span
+                    v-for="industry in industries"
+                    :key="industry.industry_id"
+                    class="tag industry-tag"
+                  >
                     {{ industry.industry_name }}
                   </span>
                   <span v-if="industries.length === 0" class="no-data">暂无数据</span>
@@ -76,7 +81,11 @@
               <div class="category-group">
                 <h4>所属概念</h4>
                 <div class="tags">
-                  <span v-for="concept in concepts" :key="concept.concept_id" class="tag concept-tag">
+                  <span
+                    v-for="concept in concepts"
+                    :key="concept.concept_id"
+                    class="tag concept-tag"
+                  >
                     {{ concept.concept_name }}
                   </span>
                   <span v-if="concepts.length === 0" class="no-data">暂无数据</span>
@@ -90,8 +99,8 @@
       <!-- 标签页内容 -->
       <div class="tabs-section">
         <div class="tabs-header">
-          <button 
-            v-for="tab in tabs" 
+          <button
+            v-for="tab in tabs"
             :key="tab.name"
             :class="['tab-btn', { active: activeTab === tab.name }]"
             @click="activeTab = tab.name"
@@ -152,7 +161,8 @@
                       </span>
                     </td>
                     <td :class="getChangeClass(transaction.change_quantity)">
-                      {{ transaction.change_quantity > 0 ? '+' : '' }}{{ formatNumber(transaction.change_quantity) }}股
+                      {{ transaction.change_quantity > 0 ? '+' : ''
+                      }}{{ formatNumber(transaction.change_quantity) }}股
                     </td>
                     <td>{{ formatNumber(transaction.after_change_quantity) }}股</td>
                   </tr>
@@ -242,12 +252,20 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { StockBasicInfoResponse, Executive, ExecutiveTransaction, Event, Shareholder, Dividend, Concept, Industry } from '@/types'
-import { marketAPI, stockAPI } from '@/services/api'
+import type {
+  StockBasicInfoResponse,
+  Executive,
+  ExecutiveTransaction,
+  Event,
+  Shareholder,
+  Dividend,
+  Concept,
+  Industry,
+} from '@/types'
+import { categoryAPI, marketAPI, stockAPI } from '@/services/api'
 import { useStockStore } from '@/stores/stock'
 
-const route = useRoute()
-const stockId = ref(parseInt(route.params.id as string))
+const stockId = ref(useStockStore().stockId)
 
 // 响应式数据
 const stockInfo = ref<StockBasicInfoResponse | null>(null)
@@ -256,7 +274,7 @@ const rawExecutiveTransactions = ref<ExecutiveTransaction[]>([])
 const executiveTransactions = computed(() => {
   return rawExecutiveTransactions.value.map(transaction => ({
     ...transaction,
-    change_type: mapExecutiveChangeType(transaction.change_type)
+    change_type: mapExecutiveChangeType(transaction.change_type),
   }))
 })
 const events = ref<Event[]>([])
@@ -272,7 +290,8 @@ const loading = ref({
   executiveTransactions: false,
   events: false,
   shareholders: false,
-  dividends: false
+  dividends: false,
+  categories: false,
 })
 
 // 标签页配置
@@ -281,29 +300,27 @@ const tabs = [
   { name: 'executive-transactions', label: '高管持股变动' },
   { name: 'events', label: '公司大事记' },
   { name: 'shareholders', label: '股东信息' },
-  { name: 'dividends', label: '分红信息' }
+  { name: 'dividends', label: '分红信息' },
 ]
 
 // 计算属性
 const sortedEvents = computed(() => {
-  return [...events.value].sort((a, b) => 
-    new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+  return [...events.value].sort(
+    (a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
   )
 })
 
 const topShareholders = computed(() => {
-  return shareholders.value
-    .sort((a, b) => b.proportion - a.proportion)
-    .slice(0, 10)
+  return shareholders.value.sort((a, b) => b.proportion - a.proportion).slice(0, 10)
 })
 
 // 工具函数
 const mapExecutiveChangeType = (type: string) => {
   const typeMap: { [key: string]: string } = {
-    'BUY': '增持',
-    'SELL': '减持',
-    'BONUS': '分红',
-    'OTHER': '其他'
+    BUY: '增持',
+    SELL: '减持',
+    BONUS: '分红',
+    OTHER: '其他',
   }
   return typeMap[type] || type
 }
@@ -334,11 +351,11 @@ const getChangeClass = (change: number): string => {
 
 const getTabCount = (tabName: string): number => {
   const counts: { [key: string]: number } = {
-    'executives': executives.value.length,
+    executives: executives.value.length,
     'executive-transactions': executiveTransactions.value.length,
-    'events': events.value.length,
-    'shareholders': shareholders.value.length,
-    'dividends': dividends.value.length
+    events: events.value.length,
+    shareholders: shareholders.value.length,
+    dividends: dividends.value.length,
   }
   return counts[tabName] || 0
 }
@@ -394,7 +411,7 @@ const fetchExecutiveTransactions = async () => {
 const fetchEvents = async () => {
   loading.value.events = true
   try {
-    events.value = await stockAPI.getEvents({ id: stockId.value })
+    events.value = await stockAPI.getEvents({ id: stockId.value || 0 })
   } catch (error) {
     ElMessage.error('获取公司事件失败')
     console.error('Failed to fetch events:', error)
@@ -432,7 +449,7 @@ const fetchDividends = async () => {
 const fetchCategories = async () => {
   loading.value.categories = true
   try {
-    const response = await categoryAPI.getCategories({ stock_id: stockId.value })
+    const response = await categoryAPI.getCategories({ id: stockId.value })
     concepts.value = response.concepts || []
     industries.value = response.industries || []
   } catch (error) {
@@ -443,7 +460,7 @@ const fetchCategories = async () => {
 }
 
 // 根据激活的标签页加载对应数据
-watch(activeTab, (newTab) => {
+watch(activeTab, newTab => {
   switch (newTab) {
     case 'executives':
       if (executives.value.length === 0) fetchExecutives()
@@ -470,8 +487,8 @@ onMounted(() => {
   fetchCategories()
 })
 // 处理交易按钮点击事件
-const stockStore = useStockStore()
 const handleTradeClick = () => {
+  const stockStore = useStockStore()
   stockStore.setStockCode(stockInfo.value?.stock_code || '')
   stockStore.setStockId(stockId.value || 0)
   router.push(`/trade`)
@@ -510,8 +527,12 @@ const handleTradeClick = () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 股票头部 */
@@ -819,8 +840,6 @@ const handleTradeClick = () => {
   margin-bottom: 30px;
   position: relative;
 }
-
-
 
 .el-table {
   margin-top: 10px;

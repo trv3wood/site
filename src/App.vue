@@ -302,7 +302,7 @@ body {
   .header-content {
     padding: 0 15px;
   }
-  
+
   .header-left {
     gap: 20px;
   }
@@ -310,7 +310,7 @@ body {
   .nav-links {
     gap: 5px;
   }
-  
+
   .nav-link {
     padding: 8px 16px;
     font-size: 0.9rem;
@@ -324,24 +324,24 @@ body {
     padding: 15px;
     gap: 15px;
   }
-  
+
   .header-left {
     flex-direction: column;
     gap: 15px;
     width: 100%;
   }
-  
+
   .app-title {
     text-align: center;
     font-size: 1.6rem;
   }
-  
+
   .nav-links {
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
   }
-  
+
   .header-right {
     width: 100%;
     justify-content: center;
@@ -351,7 +351,7 @@ body {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .auth-btn {
     padding: 10px 20px;
     font-size: 0.95rem;
@@ -363,17 +363,17 @@ body {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .nav-link {
     width: 200px;
     text-align: center;
   }
-  
+
   .header-right {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .auth-btn {
     width: 200px;
   }

@@ -1,4 +1,3 @@
-
 <style scoped>
 /* 样式与之前相同 */
 .trade-view {

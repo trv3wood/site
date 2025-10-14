@@ -29,7 +29,7 @@ export interface RegisterRequest extends LoginRequest {
 }
 
 export interface CategoriesRequest {
-  stock_id?: number
+  id: number
   [property: string]: any
 }
 export interface CategoriesResponse {

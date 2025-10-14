@@ -3,7 +3,9 @@
     <div class="page-header">
       <h2>交易记录</h2>
       <div class="header-info">
-        <span>账户余额: <strong>¥{{ userStore.user?.balance?.toFixed(2) || '0.00' }}</strong></span>
+        <span
+          >账户余额: <strong>¥{{ userStore.user?.balance?.toFixed(2) || '0.00' }}</strong></span
+        >
         <div class="filters">
           <select v-model="filterType" class="filter-select">
             <option value="all">全部类型</option>
@@ -14,21 +16,20 @@
       </div>
     </div>
 
-    
-      <div class="records-summary">
-        <div class="summary-item">
-          <span>总交易次数:</span>
-          <strong>{{ totalTrades }}</strong>
-        </div>
-        <div class="summary-item">
-          <span>买入总额:</span>
-          <strong class="buy">¥{{ buyTotal.toFixed(2) }}</strong>
-        </div>
-        <div class="summary-item">
-          <span>卖出总额:</span>
-          <strong class="sell">¥{{ sellTotal.toFixed(2) }}</strong>
-        </div>
+    <div class="records-summary">
+      <div class="summary-item">
+        <span>总交易次数:</span>
+        <strong>{{ totalTrades }}</strong>
       </div>
+      <div class="summary-item">
+        <span>买入总额:</span>
+        <strong class="buy">¥{{ buyTotal.toFixed(2) }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>卖出总额:</span>
+        <strong class="sell">¥{{ sellTotal.toFixed(2) }}</strong>
+      </div>
+    </div>
 
     <div class="records-content">
       <div v-if="filteredRecords.length === 0" class="empty-state">
@@ -68,7 +69,6 @@
           </tbody>
         </table>
       </div>
-
     </div>
   </div>
 </template>
@@ -99,7 +99,9 @@ const filteredRecords = computed(() => {
     filtered = filtered.filter(record => record.order_type === filterType.value)
   }
 
-  return filtered.sort((a, b) => new Date(b.created_time).getTime() - new Date(a.created_time).getTime())
+  return filtered.sort(
+    (a, b) => new Date(b.created_time).getTime() - new Date(a.created_time).getTime()
+  )
 })
 
 const totalTrades = computed(() => filteredRecords.value.length)
@@ -107,13 +109,13 @@ const totalTrades = computed(() => filteredRecords.value.length)
 const buyTotal = computed(() => {
   return filteredRecords.value
     .filter(record => record.order_type === 'BUY')
-    .reduce((sum, record) => sum + (record.price * record.quantity), 0)
+    .reduce((sum, record) => sum + record.price * record.quantity, 0)
 })
 
 const sellTotal = computed(() => {
   return filteredRecords.value
     .filter(record => record.order_type === 'SELL')
-    .reduce((sum, record) => sum + (record.price * record.quantity), 0)
+    .reduce((sum, record) => sum + record.price * record.quantity, 0)
 })
 
 const fetchOrderRecords = async () => {
@@ -121,7 +123,7 @@ const fetchOrderRecords = async () => {
     // 这里需要根据你的实际API调整
     // const response = await api.trade.getOrderHistory()
     // orderRecords.value = response.data || []
-    
+
     // 模拟数据
     orderRecords.value = [
       {
@@ -130,9 +132,9 @@ const fetchOrderRecords = async () => {
         stock_code: '000001',
         stock_name: '平安银行',
         order_type: 'BUY',
-        price: 11.50,
+        price: 11.5,
         quantity: 1000,
-        status: 'filled'
+        status: 'filled',
       },
       {
         order_id: 2,
@@ -140,9 +142,9 @@ const fetchOrderRecords = async () => {
         stock_code: '600036',
         stock_name: '招商银行',
         order_type: 'BUY',
-        price: 30.80,
+        price: 30.8,
         quantity: 500,
-        status: 'filled'
+        status: 'filled',
       },
       {
         order_id: 3,
@@ -150,10 +152,10 @@ const fetchOrderRecords = async () => {
         stock_code: '000001',
         stock_name: '平安银行',
         order_type: 'SELL',
-        price: 12.20,
+        price: 12.2,
         quantity: 200,
-        status: 'filled'
-      }
+        status: 'filled',
+      },
     ]
   } catch (error) {
     console.error('获取交易记录失败:', error)
@@ -168,7 +170,7 @@ const getStatusClass = (status: string) => {
   const statusMap: { [key: string]: string } = {
     filled: 'status-success',
     pending: 'status-pending',
-    cancelled: 'status-cancelled'
+    cancelled: 'status-cancelled',
   }
   return statusMap[status] || ''
 }
@@ -177,7 +179,7 @@ const getStatusText = (status: string) => {
   const statusMap: { [key: string]: string } = {
     filled: '已成交',
     pending: '处理中',
-    cancelled: '已取消'
+    cancelled: '已取消',
   }
   return statusMap[status] || status
 }
@@ -331,20 +333,20 @@ onMounted(() => {
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .header-info {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .records-table-container {
     overflow-x: auto;
   }
-  
+
   .records-table {
     min-width: 800px;
   }
-  
+
   .records-summary {
     flex-direction: column;
     gap: 15px;
