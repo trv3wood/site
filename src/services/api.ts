@@ -19,6 +19,7 @@ import type {
   HoldingsResponse,
   AnalyzeResponse,
   OrdersResponse,
+  HistoryResponse,
 } from '../types'
 import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 
@@ -192,6 +193,13 @@ export const stockAPI = {
   // 获取分红信息
   async getDividends(params: YearQueryParam): Promise<Dividend[]> {
     return get(`./api/stock/dividends`, {
+      params,
+    })
+  },
+
+  // 获取股票价格历史
+  async getPriceHistory(params: DateQueryParam): Promise<HistoryResponse[]> {
+    return get(`./api/stock/history`, {
       params,
     })
   },
