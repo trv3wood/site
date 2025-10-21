@@ -230,11 +230,11 @@ export interface HistoryResponse {
   change: number
   change_rate: number
   created_time: string
-  current_price: number | number
+  current_price: number
   market_cap: number
   quote_id: number
   stock_id: number
-  turnover: number | number
+  turnover: number
   turnover_rate: number
   volume: number
   [property: string]: any

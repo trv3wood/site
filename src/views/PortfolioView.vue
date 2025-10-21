@@ -107,21 +107,14 @@
               </div>
               <div class="detail-item">
                 <label>当前价格：</label>
-                <span>{{
-                  formatCurrency(
-                    selectedStock.current_price
-                  )
-                }}</span>
+                <span>{{ formatCurrency(selectedStock.current_price) }}</span>
               </div>
             </el-col>
             <el-col :span="12">
               <div class="detail-item">
                 <label>持仓市值：</label>
                 <span>{{
-                  formatCurrency(
-                    selectedStock.current_price *
-                      selectedStock.quantity
-                  )
+                  formatCurrency(selectedStock.current_price * selectedStock.quantity)
                 }}</span>
               </div>
               <div class="detail-item">
@@ -153,11 +146,11 @@
           <div class="analysis-text">
             <p v-if="selectedStock.profit > 0">
               当前盈利 {{ formatCurrency(selectedStock.profit) }} 元，相比成本上涨
-              {{ formatRate(selectedStock.profit_rate)}}%
+              {{ formatRate(selectedStock.profit_rate) }}%
             </p>
             <p v-else-if="selectedStock.profit < 0">
               当前亏损 {{ formatCurrency(Math.abs(selectedStock.profit)) }} 元，相比成本下跌
-              {{formatRate(selectedStock.profit_rate)}}%
+              {{ formatRate(selectedStock.profit_rate) }}%
             </p>
             <p v-else>当前不盈不亏</p>
           </div>
