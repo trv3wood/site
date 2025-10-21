@@ -48,9 +48,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr 
-                v-for="holding in holdings" 
-                :key="holding.stock_code" 
+              <tr
+                v-for="holding in holdings"
+                :key="holding.stock_code"
                 class="stock-row"
                 @click="showStockProfit(holding)"
               >
@@ -58,7 +58,9 @@
                 <td class="stock-name">{{ holding.stock_name }}</td>
                 <td>{{ holding.quantity.toLocaleString() }}</td>
                 <td>{{ formatCurrency(holding.avg_cost) }}</td>
-                <td>{{ formatCurrency(holding.current_price || calculateCurrentPrice(holding)) }}</td>
+                <td>
+                  {{ formatCurrency(holding.current_price || calculateCurrentPrice(holding)) }}
+                </td>
                 <td :class="getProfitClass(holding.profit)">
                   {{ formatCurrency(holding.profit) }}
                 </td>
@@ -71,7 +73,7 @@
             </tbody>
           </table>
         </div>
-        
+
         <!-- 空状态 -->
         <div v-if="holdings.length === 0" class="empty-state">
           <div class="empty-icon">📊</div>
@@ -105,24 +107,35 @@
               </div>
               <div class="detail-item">
                 <label>当前价格：</label>
-                <span>{{ formatCurrency(selectedStock.current_price || calculateCurrentPrice(selectedStock)) }}</span>
+                <span>{{
+                  formatCurrency(
+                    selectedStock.current_price || calculateCurrentPrice(selectedStock)
+                  )
+                }}</span>
               </div>
             </el-col>
             <el-col :span="12">
               <div class="detail-item">
                 <label>持仓市值：</label>
-                <span>{{ formatCurrency((selectedStock.current_price || calculateCurrentPrice(selectedStock)) * selectedStock.quantity) }}</span>
+                <span>{{
+                  formatCurrency(
+                    (selectedStock.current_price || calculateCurrentPrice(selectedStock)) *
+                      selectedStock.quantity
+                  )
+                }}</span>
               </div>
               <div class="detail-item">
                 <label>浮动盈亏：</label>
                 <span :class="getProfitClass(selectedStock.profit)">
-                  {{ selectedStock.profit >= 0 ? '+' : '' }}{{ formatCurrency(selectedStock.profit) }}
+                  {{ selectedStock.profit >= 0 ? '+' : ''
+                  }}{{ formatCurrency(selectedStock.profit) }}
                 </span>
               </div>
               <div class="detail-item">
                 <label>盈亏比例：</label>
                 <span :class="getProfitClass(selectedStock.profit)">
-                  {{ selectedStock.profit >= 0 ? '+' : '' }}{{ calculateProfitRate(selectedStock) }}%
+                  {{ selectedStock.profit >= 0 ? '+' : ''
+                  }}{{ calculateProfitRate(selectedStock) }}%
                 </span>
               </div>
             </el-col>
@@ -132,25 +145,25 @@
         <!-- 盈亏分析 -->
         <div class="profit-analysis">
           <h4>盈亏分析</h4>
-          <el-progress 
-            :percentage="Math.abs(Number(calculateProfitRate(selectedStock)))" 
+          <el-progress
+            :percentage="Math.abs(Number(calculateProfitRate(selectedStock)))"
             :status="selectedStock.profit >= 0 ? 'success' : 'exception'"
             :show-text="false"
           />
           <div class="analysis-text">
             <p v-if="selectedStock.profit > 0">
-              当前盈利 {{ formatCurrency(selectedStock.profit) }} 元，相比成本上涨 {{ calculateProfitRate(selectedStock) }}%
+              当前盈利 {{ formatCurrency(selectedStock.profit) }} 元，相比成本上涨
+              {{ calculateProfitRate(selectedStock) }}%
             </p>
             <p v-else-if="selectedStock.profit < 0">
-              当前亏损 {{ formatCurrency(Math.abs(selectedStock.profit)) }} 元，相比成本下跌 {{ Math.abs(Number(calculateProfitRate(selectedStock))) }}%
+              当前亏损 {{ formatCurrency(Math.abs(selectedStock.profit)) }} 元，相比成本下跌
+              {{ Math.abs(Number(calculateProfitRate(selectedStock))) }}%
             </p>
-            <p v-else>
-              当前不盈不亏
-            </p>
+            <p v-else>当前不盈不亏</p>
           </div>
         </div>
       </div>
-      
+
       <template #footer>
         <el-button @click="showProfitDialog = false">关闭</el-button>
         <el-button type="primary" @click="goToTrade(selectedStock!)">立即交易</el-button>
@@ -189,7 +202,7 @@ const formatCurrency = (value: number) => {
 // 计算最新价格
 const calculateCurrentPrice = (holding: Holding) => {
   if (holding.quantity === 0) return holding.avg_cost
-  return holding.avg_cost + (holding.profit / holding.quantity)
+  return holding.avg_cost + holding.profit / holding.quantity
 }
 
 // 计算盈亏比例
@@ -221,7 +234,7 @@ const goToTrade = (holding: Holding) => {
 // 手动刷新
 const manualRefresh = async () => {
   if (loading.value) return
-  
+
   loading.value = true
   try {
     await loadHoldings()
@@ -240,7 +253,7 @@ const loadHoldings = async () => {
     const response = await api.holdings.getHoldings()
     // 修复类型错误：直接使用response，不访问data属性
     holdings.value = Array.isArray(response) ? response : []
-    
+
     // 如果API返回的是对象且有data属性，使用data
     if (response && typeof response === 'object' && 'data' in response) {
       holdings.value = (response as any).data || []
@@ -411,8 +424,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 持仓表格容器 */
@@ -568,25 +585,25 @@ onMounted(() => {
   .portfolio-view {
     padding: 15px;
   }
-  
+
   .header-top {
     flex-direction: column;
     gap: 15px;
     text-align: center;
   }
-  
+
   .table-info {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
   }
-  
+
   .stock-table th,
   .stock-table td {
     padding: 10px 8px;
     font-size: 0.85rem;
   }
-  
+
   .balance-card {
     width: 100%;
     justify-content: center;

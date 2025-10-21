@@ -5,10 +5,10 @@
       <div class="stock-input">
         <div class="form-group">
           <label>股票代码:</label>
-          <input 
-            v-model="stockCode" 
-            type="text" 
-            class="form-input" 
+          <input
+            v-model="stockCode"
+            type="text"
+            class="form-input"
             placeholder="输入股票代码，如：000001"
             @blur="searchStock"
           />
@@ -34,10 +34,16 @@
         <div class="form-group">
           <label>交易类型:</label>
           <div class="trade-type">
-            <button :class="['type-btn', orderType === 'BUY' ? 'active' : '']" @click="orderType = 'BUY'">
+            <button
+              :class="['type-btn', orderType === 'BUY' ? 'active' : '']"
+              @click="orderType = 'BUY'"
+            >
               买入
             </button>
-            <button :class="['type-btn', orderType === 'SELL' ? 'active' : '']" @click="orderType = 'SELL'">
+            <button
+              :class="['type-btn', orderType === 'SELL' ? 'active' : '']"
+              @click="orderType = 'SELL'"
+            >
               卖出
             </button>
           </div>
@@ -45,20 +51,41 @@
 
         <div class="form-group">
           <label>价格 (¥):</label>
-          <input v-model.number="price" type="number" step="0.01" min="0" class="form-input" placeholder="输入交易价格" />
+          <input
+            v-model.number="price"
+            type="number"
+            step="0.01"
+            min="0"
+            class="form-input"
+            placeholder="输入交易价格"
+          />
         </div>
 
         <div class="form-group">
           <label>数量 (100的整数倍):</label>
-          <input v-model.number="quantity" type="number" min="100" step="100" class="form-input" placeholder="输入交易数量"
-            @blur="validateQuantity" />
+          <input
+            v-model.number="quantity"
+            type="number"
+            min="100"
+            step="100"
+            class="form-input"
+            placeholder="输入交易数量"
+            @blur="validateQuantity"
+          />
           <div v-if="quantityError" class="error-message">{{ quantityError }}</div>
         </div>
 
         <div class="trade-summary">
-          <p>交易金额: <strong>¥{{ tradeAmount.toFixed(2) }}</strong></p>
-          <p>账户余额: <strong>¥{{ userStore.user?.balance?.toFixed(2) || '0.00' }}</strong></p>
-          <p v-if="orderType === 'BUY' && tradeAmount > (userStore.user?.balance || 0)" class="error-message">
+          <p>
+            交易金额: <strong>¥{{ tradeAmount.toFixed(2) }}</strong>
+          </p>
+          <p>
+            账户余额: <strong>¥{{ userStore.user?.balance?.toFixed(2) || '0.00' }}</strong>
+          </p>
+          <p
+            v-if="orderType === 'BUY' && tradeAmount > (userStore.user?.balance || 0)"
+            class="error-message"
+          >
             余额不足
           </p>
         </div>
@@ -81,26 +108,17 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useStockStore } from '@/stores/stock'
 import api from '@/services/api'
-import { ElMessage } from 'element-plus'
-
-interface Stock {
-  stock_id: number
-  stock_code: string
-  stock_name: string
-  current_price: number
-  change: number
-}
+import type { Stock } from '@/types'
 
 const userStore = useUserStore()
 const stockStore = useStockStore()
-const stockCode = ref('')
+const stockCode = ref(stockStore.stockCode)
 const selectedStock = ref<Stock | null>(null)
 const orderType = ref<'BUY' | 'SELL'>('BUY')
 const price = ref<number>(0)
 const quantity = ref<number>(100)
 const quantityError = ref('')
-const availableStocks = ref<Stock[]>([])
-const tradeResult = ref<{ type: string, message: string } | null>(null)
+const tradeResult = ref<{ type: string; message: string } | null>(null)
 const stockSearchError = ref('')
 
 const tradeAmount = computed(() => {
@@ -108,12 +126,14 @@ const tradeAmount = computed(() => {
 })
 
 const canTrade = computed(() => {
-  return selectedStock.value &&
+  return (
+    selectedStock.value &&
     price.value > 0 &&
     quantity.value >= 100 &&
     quantity.value % 100 === 0 &&
     !quantityError.value &&
     (orderType.value === 'SELL' || tradeAmount.value <= (userStore.user?.balance || 0))
+  )
 })
 
 const validateQuantity = () => {
@@ -126,34 +146,6 @@ const validateQuantity = () => {
   }
 }
 
-const searchStock = async () => {
-  if (!stockCode.value.trim()) {
-    selectedStock.value = null
-    stockSearchError.value = ''
-    return
-  }
-
-  stockSearchError.value = ''
-  
-  try {
-    // 从可用股票列表中搜索
-    const foundStock = availableStocks.value.find(stock => 
-      stock.stock_code === stockCode.value.trim()
-    )
-    
-    if (foundStock) {
-      selectedStock.value = foundStock
-      price.value = foundStock.current_price
-    } else {
-      selectedStock.value = null
-      stockSearchError.value = '未找到该股票代码，请检查后重新输入'
-    }
-  } catch (error) {
-    console.error('搜索股票失败:', error)
-    stockSearchError.value = '搜索股票失败，请重试'
-  }
-}
-
 const submitTrade = async () => {
   if (!canTrade.value || !selectedStock.value) return
 
@@ -163,7 +155,7 @@ const submitTrade = async () => {
       stock_code: selectedStock.value.stock_code,
       order_type: orderType.value,
       price: price.value,
-      quantity: quantity.value
+      quantity: quantity.value,
     }
 
     const response = await api.trade.trade(tradeRequest)
@@ -171,14 +163,15 @@ const submitTrade = async () => {
     if (response.success) {
       tradeResult.value = {
         type: 'success',
-        message: response.message || '委托成功'
+        message: response.message || '委托成功',
       }
 
       // 更新用户余额
       if (userStore.user) {
-        const newBalance = orderType.value === 'BUY'
-          ? (userStore.user.balance - tradeAmount.value)
-          : (userStore.user.balance + tradeAmount.value)
+        const newBalance =
+          orderType.value === 'BUY'
+            ? userStore.user.balance - tradeAmount.value
+            : userStore.user.balance + tradeAmount.value
         userStore.updateBalance(newBalance)
       }
 
@@ -187,13 +180,13 @@ const submitTrade = async () => {
     } else {
       tradeResult.value = {
         type: 'error',
-        message: response.message || '交易失败'
+        message: response.message || '交易失败',
       }
     }
   } catch (error: any) {
     tradeResult.value = {
       type: 'error',
-      message: error.response?.data?.message || '交易失败，请重试'
+      message: error.response?.data?.message || '交易失败，请重试',
     }
   }
 
@@ -202,26 +195,19 @@ const submitTrade = async () => {
     tradeResult.value = null
   }, 3000)
 }
-
-const loadAvailableStocks = async () => {
+async function searchStock() {
   try {
-    // 修复：添加 type 参数
-    const response = await api.market.getMarketOverview({ type: '' })
-    availableStocks.value = Array.isArray(response) ? response : [response]
-
-    // 如果 stockStore 中有股票代码，自动填充
-    if (stockStore.stockCode) {
-      stockCode.value = stockStore.stockCode
-      await searchStock()
-    }
-  } catch (error) {
-    console.error('获取股票列表失败:', error)
-    ElMessage.error('获取股票列表失败')
+    const response = await api.stock.getStockStatus({ stock_code: stockCode.value })
+    selectedStock.value = response
+    stockSearchError.value = ''
+  } catch (error: any) {
+    stockSearchError.value = error.response.data || '股票查询失败，请重试'
   }
 }
-
 onMounted(() => {
-  loadAvailableStocks()
+  if (stockCode.value) {
+    searchStock()
+  }
 })
 </script>
 

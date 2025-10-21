@@ -26,13 +26,6 @@ const router = createRouter({
       component: () => import('@/views/MarketView.vue'),
       meta: { title: '大盘行情' },
     },
-    // {
-    //   path: '/stock/realtime',
-    //   name: 'stock-realtime',
-    //   component: () => import('@/views/StockRealtimeView.vue'),
-    //   props: true,
-    //   meta: { title: '实时行情' }
-    // },
     {
       path: '/stock/info',
       name: 'stock-info',
@@ -74,7 +67,7 @@ const router = createRouter({
     {
       path: '/transactions',
       name: 'transactions',
-      component: () => import('@/views/TransactionsView.vue'),
+      component: () => import('@/views/TradeRecordView.vue'),
       beforeEnter: requireAuth,
       meta: { title: '交易记录' },
     },
@@ -83,7 +76,7 @@ const router = createRouter({
       name: 'analysis',
       component: () => import('@/views/AnalysisView.vue'),
       beforeEnter: requireAuth,
-      meta: { title: '账户分析' }
+      meta: { title: '账户分析' },
     },
     {
       path: '/stock-analysis',
@@ -91,7 +84,7 @@ const router = createRouter({
       component: () => import('@/views/StockAnalysisView.vue'),
       props: true,
       beforeEnter: requireAuth,
-      meta: { title: '个股盈亏分析' }
+      meta: { title: '个股盈亏分析' },
     },
 
     // // 404 页面

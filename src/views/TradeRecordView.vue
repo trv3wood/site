@@ -76,20 +76,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
-
-interface OrderRecord {
-  order_id: number
-  created_time: string
-  stock_code: string
-  stock_name: string
-  order_type: 'BUY' | 'SELL'
-  price: number
-  quantity: number
-  status: string
-}
+import type { Order } from '@/types'
+import { tradeAPI } from '@/services/api'
 
 const userStore = useUserStore()
-const orderRecords = ref<OrderRecord[]>([])
+const orderRecords = ref<Order[]>([])
 const filterType = ref('all')
 
 const filteredRecords = computed(() => {
@@ -121,41 +112,11 @@ const sellTotal = computed(() => {
 const fetchOrderRecords = async () => {
   try {
     // 这里需要根据你的实际API调整
-    // const response = await api.trade.getOrderHistory()
-    // orderRecords.value = response.data || []
-    // 模拟数据
-    orderRecords.value = [
-      {
-        order_id: 1,
-        created_time: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        stock_code: '000001',
-        stock_name: '平安银行',
-        order_type: 'BUY',
-        price: 11.5,
-        quantity: 1000,
-        status: 'filled',
-      },
-      {
-        order_id: 2,
-        created_time: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        stock_code: '600036',
-        stock_name: '招商银行',
-        order_type: 'BUY',
-        price: 30.8,
-        quantity: 500,
-        status: 'filled',
-      },
-      {
-        order_id: 3,
-        created_time: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-        stock_code: '000001',
-        stock_name: '平安银行',
-        order_type: 'SELL',
-        price: 12.2,
-        quantity: 200,
-        status: 'filled',
-      },
-    ]
+    const response = await tradeAPI.getOrder()
+    orderRecords.value = response.map(item => ({
+      ...item,
+      created_time: new Date(item.created_time).toISOString(),
+    }))
   } catch (error) {
     console.error('获取交易记录失败:', error)
   }

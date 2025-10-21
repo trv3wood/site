@@ -1,7 +1,7 @@
 <template>
   <div class="analysis-container">
     <h1>账户分析</h1>
-    
+
     <!-- 时间段选择器 -->
     <div class="time-filter">
       <label>选择时间段：</label>
@@ -12,7 +12,7 @@
         <option value="1y">近1年</option>
       </select>
     </div>
-    
+
     <!-- 收益摘要卡片 -->
     <div class="stats-cards">
       <div class="card">
@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 图表区域 -->
     <div class="charts-container">
       <div class="chart-wrapper">
@@ -40,7 +40,7 @@
         <canvas ref="returnChart"></canvas>
       </div>
     </div>
-    
+
     <!-- 数据表格 -->
     <div class="data-table">
       <h3>每日收益明细</h3>
@@ -93,7 +93,7 @@ const daysMap: Record<string, number> = {
   '1m': 30,
   '3m': 90,
   '6m': 180,
-  '1y': 365
+  '1y': 365,
 }
 
 // 获取分析数据
@@ -101,7 +101,7 @@ const fetchAnalysisData = async () => {
   try {
     // 获取分析数据
     const analyzeResponse = await holdingsAPI.getAnalyze()
-    
+
     // 处理API响应，确保数据格式正确
     if (Array.isArray(analyzeResponse)) {
       // 如果直接返回数组，假设已经是AnalyzeResponse格式
@@ -113,21 +113,21 @@ const fetchAnalysisData = async () => {
       // 如果数据格式不符合预期，尝试从其他API获取数据构建
       await buildAnalysisDataFromMultipleSources()
     }
-    
+
     // 如果仍然没有数据，使用最小数据集
     if (analysisData.value.length === 0) {
       analysisData.value = buildMinimalAnalysisData()
     }
-    
+
     // 根据选择的时间段筛选数据
     filterDataByTimeRange()
-    
+
     // 计算统计指标
     calculateStats()
-    
+
     // 更新图表
     updateCharts()
-    
+
     console.log('账户分析数据获取成功')
   } catch (error) {
     console.error('获取账户分析数据失败:', error)
@@ -141,18 +141,20 @@ const fetchAnalysisData = async () => {
 
 // 格式化AnalyzeResponse数据
 const formatAnalyzeData = (data: any[]): any[] => {
-  return data.map(item => {
-    // 确保数据结构包含必要字段
-    const timestamp = item.timestamp || item.date || new Date().toISOString()
-    const profit = item.profit || item.profit_amount || 0
-    const profitRate = item.profit_rate || item.return || 0
-    
-    return {
-      timestamp, // 使用完整时间戳作为主要标识
-      profit,
-      return: profitRate
-    }
-  }).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+  return data
+    .map(item => {
+      // 确保数据结构包含必要字段
+      const timestamp = item.timestamp || item.date || new Date().toISOString()
+      const profit = item.profit || item.profit_amount || 0
+      const profitRate = item.profit_rate || item.return || 0
+
+      return {
+        timestamp, // 使用完整时间戳作为主要标识
+        profit,
+        return: profitRate,
+      }
+    })
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 }
 
 // 从多个数据源构建分析数据
@@ -161,15 +163,15 @@ const buildAnalysisDataFromMultipleSources = async () => {
     // 获取持仓数据
     const holdingsResponse = await holdingsAPI.getHoldings()
     const holdings = Array.isArray(holdingsResponse) ? holdingsResponse : []
-    
+
     // 获取订单数据
     const ordersResponse = await tradeAPI.getOrder()
     const orders = Array.isArray(ordersResponse) ? ordersResponse : []
-    
+
     // 如果有订单数据，基于订单构建分析数据
     if (orders.length > 0) {
       analysisData.value = buildAnalysisFromOrders(orders)
-    } 
+    }
     // 如果有持仓数据，基于持仓构建分析数据
     else if (holdings.length > 0) {
       analysisData.value = buildAnalysisFromHoldings(holdings)
@@ -183,20 +185,20 @@ const buildAnalysisDataFromMultipleSources = async () => {
 // 基于订单数据构建分析数据
 const buildAnalysisFromOrders = (orders: any[]): any[] => {
   // 按时间排序订单
-  const sortedOrders = [...orders].sort((a, b) => 
-    new Date(a.created_time).getTime() - new Date(b.created_time).getTime()
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(a.created_time).getTime() - new Date(b.created_time).getTime()
   )
-  
+
   const data: any[] = []
   let cumulativeProfit = 0
   let investedCapital = 0
   let previousValue = 100000 // 初始资金
-  
+
   // 创建订单数据点，保留原始时间戳
   sortedOrders.forEach(order => {
     const timestamp = order.created_time
     const orderValue = order.price * order.quantity
-    
+
     if (order.order_type === 'BUY') {
       investedCapital += orderValue
     } else if (order.order_type === 'SELL') {
@@ -205,19 +207,19 @@ const buildAnalysisFromOrders = (orders: any[]): any[] => {
       const profit = (order.price - buyPrice) * order.quantity
       cumulativeProfit += profit
     }
-    
+
     data.push({
       timestamp,
       profit: cumulativeProfit,
-      return: (cumulativeProfit / 100000) * 100
+      return: (cumulativeProfit / 100000) * 100,
     })
   })
-  
+
   // 如果没有订单，生成基础数据
   if (data.length === 0) {
     return buildMinimalAnalysisData()
   }
-  
+
   return data
 }
 
@@ -225,7 +227,7 @@ const buildAnalysisFromOrders = (orders: any[]): any[] => {
 const buildAnalysisFromHoldings = (holdings: any[]): any[] => {
   const data: any[] = []
   const today = new Date()
-  
+
   // 计算总持仓价值和盈亏
   let totalValue = 0
   let totalProfit = 0
@@ -233,25 +235,25 @@ const buildAnalysisFromHoldings = (holdings: any[]): any[] => {
     totalValue += (holding.current_price || 0) * (holding.quantity || 0)
     totalProfit += holding.profit || 0
   })
-  
+
   // 生成最近30天的简单数据，包含不同时间点
   for (let i = 30; i >= 0; i--) {
     const timestamp = new Date(today)
     timestamp.setDate(timestamp.getDate() - i)
     // 添加不同的小时数以区分同一天的不同数据点
     timestamp.setHours(i % 24, 0, 0, 0)
-    
+
     // 简单线性变化，实际应该更复杂
     const dayProfit = totalProfit * (1 - i / 60) // 假设两个月前开始有利润
     const dayReturn = (dayProfit / 100000) * 100
-    
+
     data.push({
       timestamp: timestamp.toISOString(),
       profit: dayProfit,
-      return: dayReturn
+      return: dayReturn,
     })
   }
-  
+
   return data
 }
 
@@ -259,21 +261,21 @@ const buildAnalysisFromHoldings = (holdings: any[]): any[] => {
 const buildMinimalAnalysisData = (): any[] => {
   const data: any[] = []
   const today = new Date()
-  
+
   // 生成最近30天的最小数据，包含不同时间点
   for (let i = 30; i >= 0; i--) {
     const timestamp = new Date(today)
     timestamp.setDate(timestamp.getDate() - i)
     // 添加不同的小时数以区分同一天的不同数据点
     timestamp.setHours(i % 24, 0, 0, 0)
-    
+
     data.push({
       timestamp: timestamp.toISOString(),
       profit: 0,
-      return: 0
+      return: 0,
     })
   }
-  
+
   return data
 }
 
@@ -282,7 +284,7 @@ const filterDataByTimeRange = () => {
   const days = daysMap[selectedTimeRange.value]
   const cutoffDate = new Date()
   cutoffDate.setDate(cutoffDate.getDate() - days)
-  
+
   // 确保数据有时间戳字段进行筛选
   filteredData.value = analysisData.value.filter(item => {
     if (!item.timestamp) return false
@@ -297,7 +299,7 @@ const calculateStats = () => {
     totalReturn.value = 0
     return
   }
-  
+
   // 计算累计收益额和收益率
   const lastItem = filteredData.value[filteredData.value.length - 1]
   totalProfit.value = lastItem.profit || 0
@@ -307,29 +309,34 @@ const calculateStats = () => {
 // 更新图表
 const updateCharts = () => {
   if (filteredData.value.length === 0) return
-  
+
   const labels = filteredData.value.map(item => formatDateTime(item.timestamp))
   const profitData = filteredData.value.map(item => item.profit || 0)
   const returnData = filteredData.value.map(item => item.return || 0)
-  
+
   // 更新收益额图表
   if (profitChartInstance) {
     profitChartInstance.destroy()
   }
-  
+
   if (profitChart.value) {
     profitChartInstance = new Chart(profitChart.value, {
       type: 'line',
       data: {
         labels,
-        datasets: [{
-          label: '累计收益额',
-          data: profitData,
-          borderColor: profitData[profitData.length - 1] >= 0 ? '#10B981' : '#EF4444',
-          backgroundColor: profitData[profitData.length - 1] >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
+        datasets: [
+          {
+            label: '累计收益额',
+            data: profitData,
+            borderColor: profitData[profitData.length - 1] >= 0 ? '#10B981' : '#EF4444',
+            backgroundColor:
+              profitData[profitData.length - 1] >= 0
+                ? 'rgba(16, 185, 129, 0.1)'
+                : 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4,
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -337,49 +344,54 @@ const updateCharts = () => {
         aspectRatio: 2.5,
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           tooltip: {
             callbacks: {
-              label: function(context: any) {
+              label: function (context: any) {
                 return `¥${context.parsed.y.toFixed(2)}`
-              }
-            }
-          }
+              },
+            },
+          },
         },
         scales: {
           y: {
             ticks: {
-              callback: function(value: any) {
+              callback: function (value: any) {
                 return '¥' + Number(value).toFixed(0)
-              }
+              },
             },
             suggestedMin: Math.min(...profitData) * 1.1,
-            suggestedMax: Math.max(...profitData) * 1.1
-          }
-        }
-      }
+            suggestedMax: Math.max(...profitData) * 1.1,
+          },
+        },
+      },
     })
   }
-  
+
   // 更新收益率图表
   if (returnChartInstance) {
     returnChartInstance.destroy()
   }
-  
+
   if (returnChart.value) {
     returnChartInstance = new Chart(returnChart.value, {
       type: 'line',
       data: {
         labels,
-        datasets: [{
-          label: '累计收益率',
-          data: returnData,
-          borderColor: returnData[returnData.length - 1] >= 0 ? '#10B981' : '#EF4444',
-          backgroundColor: returnData[returnData.length - 1] >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
+        datasets: [
+          {
+            label: '累计收益率',
+            data: returnData,
+            borderColor: returnData[returnData.length - 1] >= 0 ? '#10B981' : '#EF4444',
+            backgroundColor:
+              returnData[returnData.length - 1] >= 0
+                ? 'rgba(16, 185, 129, 0.1)'
+                : 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4,
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -387,28 +399,28 @@ const updateCharts = () => {
         aspectRatio: 2.5,
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           tooltip: {
             callbacks: {
-              label: function(context: any) {
+              label: function (context: any) {
                 return `${context.parsed.y.toFixed(2)}%`
-              }
-            }
-          }
+              },
+            },
+          },
         },
         scales: {
           y: {
             ticks: {
-              callback: function(value: any) {
+              callback: function (value: any) {
                 return Number(value).toFixed(1) + '%'
-              }
+              },
             },
             suggestedMin: Math.min(...returnData) * 1.1,
-            suggestedMax: Math.max(...returnData) * 1.1
-          }
-        }
-      }
+            suggestedMax: Math.max(...returnData) * 1.1,
+          },
+        },
+      },
     })
   }
 }
@@ -425,8 +437,6 @@ const formatDateTime = (dateTimeString: string) => {
   const date = new Date(dateTimeString)
   return date.toLocaleString('zh-CN')
 }
-
-
 
 // 过滤后的数据
 const filteredData = ref<any[]>([])
@@ -459,7 +469,7 @@ const cleanup = () => {
 
 // 导出清理函数供父组件使用
 defineExpose({
-  cleanup
+  cleanup,
 })
 </script>
 
@@ -472,7 +482,7 @@ defineExpose({
 
 h1 {
   margin-bottom: 30px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 .time-filter {
@@ -486,7 +496,7 @@ h1 {
 
 .time-filter select {
   padding: 8px 12px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   background-color: white;
 }
@@ -507,7 +517,7 @@ h1 {
 
 .card h3 {
   margin-bottom: 10px;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 14px;
   font-weight: 500;
 }
@@ -518,11 +528,11 @@ h1 {
 }
 
 .card .positive {
-  color: #10B981;
+  color: #10b981;
 }
 
 .card .negative {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .charts-container {
@@ -541,7 +551,7 @@ h1 {
 
 .chart-wrapper h3 {
   margin-bottom: 20px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 .chart-wrapper {
@@ -570,7 +580,7 @@ h1 {
 
 .data-table h3 {
   margin-bottom: 20px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 table {
@@ -578,24 +588,25 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 th {
-  background-color: #F9FAFB;
+  background-color: #f9fafb;
   font-weight: 600;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 td.positive {
-  color: #10B981;
+  color: #10b981;
 }
 
 td.negative {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 @media (max-width: 768px) {

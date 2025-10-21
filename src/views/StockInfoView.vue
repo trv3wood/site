@@ -25,10 +25,12 @@
             </div>
             <div class="price-change" :class="getPriceChangeClass(realtimeData.changePercent)">
               <span class="change-amount">
-                {{ realtimeData.changeAmount > 0 ? '+' : '' }}{{ formatCurrency(realtimeData.changeAmount) }}
+                {{ realtimeData.changeAmount > 0 ? '+' : ''
+                }}{{ formatCurrency(realtimeData.changeAmount) }}
               </span>
               <span class="change-percent">
-                {{ realtimeData.changePercent > 0 ? '+' : '' }}{{ realtimeData.changePercent.toFixed(2) }}%
+                {{ realtimeData.changePercent > 0 ? '+' : ''
+                }}{{ realtimeData.changePercent.toFixed(2) }}%
               </span>
             </div>
           </div>
@@ -60,9 +62,12 @@
             <div class="chart-header">
               <h3>实时行情</h3>
               <div class="chart-controls">
-                <button v-for="period in timePeriods" :key="period.value"
+                <button
+                  v-for="period in timePeriods"
+                  :key="period.value"
                   :class="['period-btn', { active: selectedPeriod === period.value }]"
-                  @click="switchTimePeriod(period.value)">
+                  @click="switchTimePeriod(period.value)"
+                >
                   {{ period.label }}
                 </button>
               </div>
@@ -133,7 +138,11 @@
             <div class="category-group" v-if="industries.length > 0">
               <h4>所属行业</h4>
               <div class="category-tags">
-                <span v-for="industry in industries" :key="industry.industry_id" class="category-tag">
+                <span
+                  v-for="industry in industries"
+                  :key="industry.industry_id"
+                  class="category-tag"
+                >
                   {{ industry.industry_name }}
                 </span>
               </div>
@@ -157,8 +166,12 @@
       <div class="tabs-section">
         <div class="tabs-header">
           <div class="tabs-nav">
-            <button v-for="tab in tabs" :key="tab.name" :class="['tab-nav-btn', { active: activeTab === tab.name }]"
-              @click="switchTab(tab.name)">
+            <button
+              v-for="tab in tabs"
+              :key="tab.name"
+              :class="['tab-nav-btn', { active: activeTab === tab.name }]"
+              @click="switchTab(tab.name)"
+            >
               {{ tab.label }}
               <span class="tab-count">({{ getTabCount(tab.name) }})</span>
             </button>
@@ -194,9 +207,13 @@
                 <p>暂无高管信息</p>
               </div>
               <div class="pagination-container" v-if="executives.length > pageSize">
-                <el-pagination v-model:current-page="pagination.executives.currentPage" :page-size="pageSize"
-                  :total="executives.length" layout="prev, pager, next"
-                  @current-change="() => handlePageChange('executives')" />
+                <el-pagination
+                  v-model:current-page="pagination.executives.currentPage"
+                  :page-size="pageSize"
+                  :total="executives.length"
+                  layout="prev, pager, next"
+                  @current-change="() => handlePageChange('executives')"
+                />
               </div>
             </div>
           </div>
@@ -220,14 +237,17 @@
                       <td class="executive-name">{{ transaction.executive_name }}</td>
                       <td>{{ formatDate(transaction.change_date) }}</td>
                       <td>
-                        <span class="change-type" :class="getChangeTypeClass(transaction.change_type)">
+                        <span
+                          class="change-type"
+                          :class="getChangeTypeClass(transaction.change_type)"
+                        >
                           {{ mapExecutiveChangeType(transaction.change_type) }}
                         </span>
                       </td>
                       <td :class="getChangeClass(transaction.change_quantity)">
                         <span class="change-quantity">
-                          {{ transaction.change_quantity > 0 ? '+' : '' }}{{ formatNumber(transaction.change_quantity)
-                          }}
+                          {{ transaction.change_quantity > 0 ? '+' : ''
+                          }}{{ formatNumber(transaction.change_quantity) }}
                         </span>
                       </td>
                       <td class="shares">{{ formatNumber(transaction.after_change_quantity) }}</td>
@@ -240,9 +260,13 @@
                 <p>暂无高管持股变动信息</p>
               </div>
               <div class="pagination-container" v-if="executiveTransactions.length > pageSize">
-                <el-pagination v-model:current-page="pagination.executiveTransactions.currentPage" :page-size="pageSize"
-                  :total="executiveTransactions.length" layout="prev, pager, next"
-                  @current-change="() => handlePageChange('executive-transactions')" />
+                <el-pagination
+                  v-model:current-page="pagination.executiveTransactions.currentPage"
+                  :page-size="pageSize"
+                  :total="executiveTransactions.length"
+                  layout="prev, pager, next"
+                  @current-change="() => handlePageChange('executive-transactions')"
+                />
               </div>
             </div>
           </div>
@@ -277,9 +301,13 @@
                 <p>暂无公司大事记</p>
               </div>
               <div class="pagination-container" v-if="events.length > pageSize">
-                <el-pagination v-model:current-page="pagination.events.currentPage" :page-size="pageSize"
-                  :total="events.length" layout="prev, pager, next"
-                  @current-change="() => handlePageChange('events')" />
+                <el-pagination
+                  v-model:current-page="pagination.events.currentPage"
+                  :page-size="pageSize"
+                  :total="events.length"
+                  layout="prev, pager, next"
+                  @current-change="() => handlePageChange('events')"
+                />
               </div>
             </div>
           </div>
@@ -298,7 +326,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="shareholder in paginatedShareholders" :key="shareholder.shareholder_id">
+                    <tr
+                      v-for="shareholder in paginatedShareholders"
+                      :key="shareholder.shareholder_id"
+                    >
                       <td class="shareholder-name">{{ shareholder.shareholder_name }}</td>
                       <td class="shares">{{ formatNumber(shareholder.share_quantity) }}</td>
                       <td>
@@ -316,9 +347,13 @@
                 <p>暂无股东信息</p>
               </div>
               <div class="pagination-container" v-if="shareholders.length > pageSize">
-                <el-pagination v-model:current-page="pagination.shareholders.currentPage" :page-size="pageSize"
-                  :total="shareholders.length" layout="prev, pager, next"
-                  @current-change="() => handlePageChange('shareholders')" />
+                <el-pagination
+                  v-model:current-page="pagination.shareholders.currentPage"
+                  :page-size="pageSize"
+                  :total="shareholders.length"
+                  layout="prev, pager, next"
+                  @current-change="() => handlePageChange('shareholders')"
+                />
               </div>
             </div>
           </div>
@@ -339,7 +374,9 @@
                   <tbody>
                     <tr v-for="dividend in paginatedDividends" :key="dividend.dividend_id">
                       <td class="dividend-plan">{{ dividend.plan }}</td>
-                      <td class="announcement-date">{{ formatDate(dividend.announcement_date) }}</td>
+                      <td class="announcement-date">
+                        {{ formatDate(dividend.announcement_date) }}
+                      </td>
                       <td class="ex-dividend-date">{{ formatDate(dividend.ex_dividend_date) }}</td>
                       <td class="payment-date">{{ formatDate(dividend.payment_date) }}</td>
                     </tr>
@@ -351,9 +388,13 @@
                 <p>暂无分红信息</p>
               </div>
               <div class="pagination-container" v-if="dividends.length > pageSize">
-                <el-pagination v-model:current-page="pagination.dividends.currentPage" :page-size="pageSize"
-                  :total="dividends.length" layout="prev, pager, next"
-                  @current-change="() => handlePageChange('dividends')" />
+                <el-pagination
+                  v-model:current-page="pagination.dividends.currentPage"
+                  :page-size="pageSize"
+                  :total="dividends.length"
+                  layout="prev, pager, next"
+                  @current-change="() => handlePageChange('dividends')"
+                />
               </div>
             </div>
           </div>
@@ -366,9 +407,7 @@
       <div class="loading-spinner">
         <div class="no-data-icon">❌</div>
         <p>股票信息加载失败</p>
-        <button @click="reloadPage" class="action-btn" style="margin-top: 10px;">
-          重新加载
-        </button>
+        <button @click="reloadPage" class="action-btn" style="margin-top: 10px">重新加载</button>
       </div>
     </div>
   </div>
@@ -389,7 +428,7 @@ import {
   Tooltip,
   Legend,
   Filler,
-  type ChartItem
+  type ChartItem,
 } from 'chart.js'
 import type {
   StockBasicInfoResponse,
@@ -400,7 +439,7 @@ import type {
   Dividend,
   Concept,
   Industry,
-  HistoryResponse
+  HistoryResponse,
 } from '@/types'
 import { marketAPI, stockAPI, categoryAPI } from '@/services/api'
 import { useStockStore } from '@/stores/stock'
@@ -432,7 +471,7 @@ const rawExecutiveTransactions = ref<ExecutiveTransaction[]>([])
 const executiveTransactions = computed(() => {
   return rawExecutiveTransactions.value.map(transaction => ({
     ...transaction,
-    change_type: mapExecutiveChangeType(transaction.change_type)
+    change_type: mapExecutiveChangeType(transaction.change_type),
   }))
 })
 const events = ref<Event[]>([])
@@ -453,7 +492,7 @@ const realtimeData = ref({
   highPrice: 11.2,
   lowPrice: 10.3,
   volume: 1000000,
-  timestamp: ''
+  timestamp: '',
 })
 
 const countdown = ref(5)
@@ -470,7 +509,7 @@ const timePeriods = [
   { label: '5天', value: '5d' },
   { label: '1月', value: '1m' },
   { label: '3月', value: '3m' },
-  { label: '1年', value: '1y' }
+  { label: '1年', value: '1y' },
 ]
 
 // 分页状态
@@ -479,7 +518,7 @@ const pagination = ref({
   executiveTransactions: { currentPage: 1 },
   events: { currentPage: 1 },
   shareholders: { currentPage: 1 },
-  dividends: { currentPage: 1 }
+  dividends: { currentPage: 1 },
 })
 
 const loading = ref({
@@ -489,7 +528,7 @@ const loading = ref({
   events: false,
   shareholders: false,
   dividends: false,
-  categories: false
+  categories: false,
 })
 
 // 定时器
@@ -528,7 +567,7 @@ const tabs = [
   { name: 'executive-transactions', label: '高管持股变动' },
   { name: 'events', label: '公司大事记' },
   { name: 'shareholders', label: '股东信息' },
-  { name: 'dividends', label: '分红信息' }
+  { name: 'dividends', label: '分红信息' },
 ]
 
 // 工具函数
@@ -559,30 +598,30 @@ const getPriceChangeClass = (changePercent: number) => {
 
 const mapExecutiveChangeType = (type: string) => {
   const typeMap: { [key: string]: string } = {
-    'BUY': '增持',
-    'SELL': '减持',
-    'BONUS': '分红',
-    'OTHER': '其他'
+    BUY: '增持',
+    SELL: '减持',
+    BONUS: '分红',
+    OTHER: '其他',
   }
   return typeMap[type] || type
 }
 
 const getChangeTypeClass = (type: string) => {
   const typeMap: { [key: string]: string } = {
-    'BUY': 'buy',
-    'SELL': 'sell',
-    'BONUS': 'bonus',
-    'OTHER': 'other'
+    BUY: 'buy',
+    SELL: 'sell',
+    BONUS: 'bonus',
+    OTHER: 'other',
   }
   return typeMap[type] || 'other'
 }
 
 const getEventTypeClass = (type: string) => {
   const typeMap: { [key: string]: string } = {
-    '业绩预告': 'performance',
-    '重大合同': 'contract',
-    '股权变动': 'equity',
-    '其他': 'other'
+    业绩预告: 'performance',
+    重大合同: 'contract',
+    股权变动: 'equity',
+    其他: 'other',
   }
   return typeMap[type] || 'other'
 }
@@ -598,11 +637,11 @@ const getChangeClass = (change: number): string => {
 
 const getTabCount = (tabName: string): number => {
   const counts: { [key: string]: number } = {
-    'executives': executives.value.length,
+    executives: executives.value.length,
     'executive-transactions': executiveTransactions.value.length,
-    'events': events.value.length,
-    'shareholders': shareholders.value.length,
-    'dividends': dividends.value.length
+    events: events.value.length,
+    shareholders: shareholders.value.length,
+    dividends: dividends.value.length,
   }
   return counts[tabName] || 0
 }
@@ -645,7 +684,6 @@ const fetchChartData = async (period: string) => {
     const mockData = generateMockChartData(period)
     hasChartData.value = mockData.times.length > 0
     return mockData
-
   } catch (error) {
     console.error('获取图表数据失败:', error)
     const mockData = generateMockChartData(period)
@@ -658,7 +696,8 @@ const fetchChartData = async (period: string) => {
 
 const generateMockChartData = (period: string) => {
   const basePrice = 10.5
-  const dataCount = period === '1d' ? 24 : period === '5d' ? 20 : period === '1m' ? 30 : period === '3m' ? 90 : 120
+  const dataCount =
+    period === '1d' ? 24 : period === '5d' ? 20 : period === '1m' ? 30 : period === '3m' ? 90 : 120
   const times: string[] = []
   const prices: number[] = []
 
@@ -672,10 +711,12 @@ const generateMockChartData = (period: string) => {
       times.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`)
     } else {
       const date = new Date(now.getTime() - (dataCount - i - 1) * 24 * 60 * 60 * 1000)
-      times.push(date.toLocaleDateString('zh-CN', {
-        month: '2-digit',
-        day: '2-digit'
-      }))
+      times.push(
+        date.toLocaleDateString('zh-CN', {
+          month: '2-digit',
+          day: '2-digit',
+        })
+      )
     }
 
     currentPrice += (Math.random() - 0.5) * 0.5
@@ -722,15 +763,15 @@ const initChart = async () => {
             pointHoverRadius: 5,
             fill: true,
             tension: 0.4,
-          }
-        ]
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           tooltip: {
             mode: 'index',
@@ -743,23 +784,23 @@ const initChart = async () => {
             callbacks: {
               label: function (context: any) {
                 return `价格: ${formatCurrency(context.parsed.y)}`
-              }
-            }
-          }
+              },
+            },
+          },
         },
         scales: {
           x: {
             type: 'category',
             grid: {
-              display: false
+              display: false,
             },
             ticks: {
               maxRotation: selectedPeriod.value === '1d' ? 0 : 45,
               color: '#666',
               font: {
-                size: 10
-              }
-            }
+                size: 10,
+              },
+            },
           },
           y: {
             type: 'linear',
@@ -771,18 +812,18 @@ const initChart = async () => {
               color: '#666',
               callback: function (value: string | number) {
                 return formatCurrency(Number(value))
-              }
+              },
             },
             border: {
-              display: false
-            }
-          }
+              display: false,
+            },
+          },
         },
         interaction: {
           intersect: false,
-          mode: 'index'
-        }
-      }
+          mode: 'index',
+        },
+      },
     })
   } catch (error) {
     console.error('初始化图表失败:', error)
@@ -828,7 +869,6 @@ const updateChartData = async () => {
       firstDataset.data = chartData.prices
       chartInstance.value.update('none')
     }
-
   } catch (error) {
     console.error('更新图表数据失败:', error)
     // 如果更新失败，重新初始化图表
@@ -906,7 +946,7 @@ const fetchExecutiveTransactions = async () => {
     rawExecutiveTransactions.value = await stockAPI.getExecutiveTransactions({
       stock_id: stockId.value,
       start_date: null,
-      end_date: null
+      end_date: null,
     })
   } catch (error) {
     ElMessage.error('获取高管交易记录失败')
@@ -945,7 +985,7 @@ const fetchDividends = async () => {
   try {
     dividends.value = await stockAPI.getDividends({
       stock_id: stockId.value,
-      year: null
+      year: null,
     })
   } catch (error) {
     ElMessage.error('获取分红信息失败')
@@ -968,25 +1008,28 @@ const fetchCategories = async () => {
 }
 
 // 监听查询参数变化
-watch(() => route.query.id, (newId) => {
-  if (newId) {
-    const id = parseInt(newId as string)
-    if (!isNaN(id)) {
-      stockId.value = id
-      stockStore.setStockId(id)
-      fetchStockInfo()
-      fetchExecutives()
-      fetchCategories()
-      // 延迟初始化图表，避免竞争条件
-      setTimeout(() => {
-        initChart()
-      }, 100)
+watch(
+  () => route.query.id,
+  newId => {
+    if (newId) {
+      const id = parseInt(newId as string)
+      if (!isNaN(id)) {
+        stockId.value = id
+        stockStore.setStockId(id)
+        fetchStockInfo()
+        fetchExecutives()
+        fetchCategories()
+        // 延迟初始化图表，避免竞争条件
+        setTimeout(() => {
+          initChart()
+        }, 100)
+      }
     }
   }
-})
+)
 
 // 监听标签页切换
-watch(activeTab, (newTab) => {
+watch(activeTab, newTab => {
   switch (newTab) {
     case 'executives':
       if (executives.value.length === 0) fetchExecutives()
@@ -1013,11 +1056,7 @@ onMounted(() => {
     stockId.value = idFromQuery
     stockStore.setStockId(idFromQuery)
 
-    Promise.all([
-      fetchStockInfo(),
-      fetchExecutives(),
-      fetchCategories()
-    ]).then(() => {
+    Promise.all([fetchStockInfo(), fetchExecutives(), fetchCategories()]).then(() => {
       // 延迟初始化图表
       setTimeout(() => {
         initChart()
@@ -1819,8 +1858,6 @@ onUnmounted(() => {
   margin-bottom: 30px;
   position: relative;
 }
-
-
 
 .el-table {
   margin-top: 10px;

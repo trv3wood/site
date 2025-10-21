@@ -21,6 +21,7 @@ import type {
   HoldingsResponse,
   AnalyzeResponse,
   OrdersResponse,
+  Stock,
 } from '../types'
 import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 
@@ -201,6 +202,13 @@ export const stockAPI = {
   // 获取股票价格历史
   async getPriceHistory(params: DateQueryParam): Promise<HistoryResponse[]> {
     return get(`./api/stock/history`, {
+      params,
+    })
+  },
+
+  // 获取股票状态
+  async getStockStatus(params: { stock_code: string }): Promise<Stock> {
+    return get(`./api/stock/status`, {
       params,
     })
   },

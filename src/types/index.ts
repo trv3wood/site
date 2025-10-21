@@ -219,23 +219,30 @@ export interface Order {
 export interface OrdersResponse extends Array<Order> {}
 
 export interface HistoryRequest {
-    end_date?: string;
-    start_date?: string;
-    stock_id: number;
-    [property: string]: any;
+  end_date?: string
+  start_date?: string
+  stock_id: number
+  [property: string]: any
 }
 
 export interface HistoryResponse {
-    change: number;
-    change_rate: number;
-    created_time: string;
-    current_price: number | number;
-    market_cap: number;
-    quote_id: number;
-    stock_id: number;
-    turnover: number | number;
-    turnover_rate: number;
-    volume: number;
-    [property: string]: any;
+  change: number
+  change_rate: number
+  created_time: string
+  current_price: number | number
+  market_cap: number
+  quote_id: number
+  stock_id: number
+  turnover: number | number
+  turnover_rate: number
+  volume: number
+  [property: string]: any
 }
 
+export interface Stock {
+  stock_id: number
+  stock_code: string
+  stock_name: string
+  current_price: number
+  change: number
+}

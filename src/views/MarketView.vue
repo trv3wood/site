@@ -5,22 +5,14 @@
       <div class="header-top">
         <h1 class="page-title">大盘行情</h1>
         <div class="market-tabs">
-          <button 
-            :class="{ active: activeTab === 'sh' }" 
-            @click="switchTab('sh')"
-            class="tab-btn"
-          >
+          <button :class="{ active: activeTab === 'sh' }" @click="switchTab('sh')" class="tab-btn">
             沪市 (6开头)
           </button>
-          <button 
-            :class="{ active: activeTab === 'sz' }" 
-            @click="switchTab('sz')"
-            class="tab-btn"
-          >
+          <button :class="{ active: activeTab === 'sz' }" @click="switchTab('sz')" class="tab-btn">
             深市 (0开头)
           </button>
-          <button 
-            :class="{ active: activeTab === 'cyb' }" 
+          <button
+            :class="{ active: activeTab === 'cyb' }"
             @click="switchTab('cyb')"
             class="tab-btn"
           >
@@ -56,7 +48,12 @@
             </div>
             <div class="refresh-options">
               <label for="refresh-interval" class="refresh-label">刷新间隔:</label>
-              <select id="refresh-interval" v-model="selectedInterval" @change="updateRefreshInterval" class="refresh-select">
+              <select
+                id="refresh-interval"
+                v-model="selectedInterval"
+                @change="updateRefreshInterval"
+                class="refresh-select"
+              >
                 <option value="3000">3秒</option>
                 <option value="5000">5秒</option>
                 <option value="10000">10秒</option>
@@ -87,9 +84,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="stock in stocks" 
-              :key="stock.stock_id" 
+            <tr
+              v-for="stock in stocks"
+              :key="stock.stock_id"
               @click="handleStockClick(stock)"
               class="stock-row"
             >
@@ -278,7 +275,7 @@ const handleStockClick = (stock: Stock) => {
   // 使用查询参数传递股票ID
   router.push({
     path: '/stock/info',
-    query: { id: stock.stock_id }
+    query: { id: stock.stock_id },
   })
 }
 </script>
@@ -466,8 +463,12 @@ const handleStockClick = (stock: Stock) => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 错误状态样式 */
@@ -626,11 +627,11 @@ const handleStockClick = (stock: Stock) => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .tab-btn {
     width: 100%;
   }
-  
+
   .refresh-controls {
     flex-direction: column;
     gap: 10px;
@@ -640,8 +641,9 @@ const handleStockClick = (stock: Stock) => {
     flex-direction: column;
     gap: 8px;
   }
-  
-  .refresh-select, .action-btn {
+
+  .refresh-select,
+  .action-btn {
     width: 100%;
   }
 }
