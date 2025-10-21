@@ -5,18 +5,26 @@
       <div class="header-top">
         <h1 class="page-title">大盘行情</h1>
         <div class="market-tabs">
-          <button :class="{ active: activeTab === 'sh' }" @click="switchTab('sh')" class="tab-btn">
+          <button 
+            :class="{ active: activeTab === 'sh' }" 
+            @click="switchTab('sh')"
+            class="tab-btn"
+          >
             沪市 (6开头)
           </button>
-          <button :class="{ active: activeTab === 'sz' }" @click="switchTab('sz')" class="tab-btn">
-            深市 (3开头)
+          <button 
+            :class="{ active: activeTab === 'sz' }" 
+            @click="switchTab('sz')"
+            class="tab-btn"
+          >
+            深市 (0开头)
           </button>
-          <button
-            :class="{ active: activeTab === 'cyb' }"
+          <button 
+            :class="{ active: activeTab === 'cyb' }" 
             @click="switchTab('cyb')"
             class="tab-btn"
           >
-            创业板 (0开头)
+            创业板 (3开头)
           </button>
         </div>
       </div>
@@ -48,12 +56,7 @@
             </div>
             <div class="refresh-options">
               <label for="refresh-interval" class="refresh-label">刷新间隔:</label>
-              <select
-                id="refresh-interval"
-                v-model="selectedInterval"
-                @change="updateRefreshInterval"
-                class="refresh-select"
-              >
+              <select id="refresh-interval" v-model="selectedInterval" @change="updateRefreshInterval" class="refresh-select">
                 <option value="3000">3秒</option>
                 <option value="5000">5秒</option>
                 <option value="10000">10秒</option>
@@ -84,9 +87,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="stock in stocks"
-              :key="stock.stock_id"
+            <tr 
+              v-for="stock in stocks" 
+              :key="stock.stock_id" 
               @click="handleStockClick(stock)"
               class="stock-row"
             >
@@ -271,7 +274,12 @@ const stockStore = useStockStore()
 // 处理股票点击事件
 const handleStockClick = (stock: Stock) => {
   stockStore.setStockId(stock.stock_id)
-  router.push(`/stock/info`)
+  stockStore.setStockCode(stock.stock_code)
+  // 使用查询参数传递股票ID
+  router.push({
+    path: '/stock/info',
+    query: { id: stock.stock_id }
+  })
 }
 </script>
 
@@ -284,7 +292,7 @@ const handleStockClick = (stock: Stock) => {
   min-height: 100vh;
 }
 
-/* 页面头部样式 - 调整为淡色系 */
+/* 页面头部样式 */
 .header {
   margin-bottom: 20px;
 }
@@ -295,7 +303,7 @@ const handleStockClick = (stock: Stock) => {
   align-items: center;
   margin-bottom: 20px;
   background: white;
-  padding: 15px 20px; /* 调扁一点 */
+  padding: 16px 20px; /* 调小一点 */
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
@@ -303,7 +311,7 @@ const handleStockClick = (stock: Stock) => {
 
 .page-title {
   margin: 0;
-  font-size: 1.6rem; /* 调小一点，不超过股票交易系统 */
+  font-size: 1.5rem; /* 调小一点 */
   font-weight: 700;
   color: #495057;
 }
@@ -458,12 +466,8 @@ const handleStockClick = (stock: Stock) => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* 错误状态样式 */
@@ -622,11 +626,11 @@ const handleStockClick = (stock: Stock) => {
     flex-direction: column;
     align-items: stretch;
   }
-
+  
   .tab-btn {
     width: 100%;
   }
-
+  
   .refresh-controls {
     flex-direction: column;
     gap: 10px;
@@ -636,9 +640,8 @@ const handleStockClick = (stock: Stock) => {
     flex-direction: column;
     gap: 8px;
   }
-
-  .refresh-select,
-  .action-btn {
+  
+  .refresh-select, .action-btn {
     width: 100%;
   }
 }

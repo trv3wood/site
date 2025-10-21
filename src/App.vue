@@ -31,15 +31,6 @@ const handleLogout = async () => {
     loading.value = false
   }
 }
-
-// onMounted(async () => {
-//   try {
-//     const test = await api.client.apiRequest('/index')
-//     console.log(test)
-//   } catch (error) {
-//     console.error('API测试失败:', error)
-//   }
-// })
 </script>
 
 <template>
@@ -59,21 +50,21 @@ const handleLogout = async () => {
         <div class="header-content">
           <h1 @click="goHome" class="app-title">股票交易系统</h1>
           <nav class="nav-links">
-            <router-link to="/market">股票行情</router-link>
+            <router-link to="/market" class="nav-link">大盘行情</router-link>
 
             <!-- 登录用户专属菜单 -->
             <template v-if="isLoggedIn">
-              <router-link to="/trade">交易</router-link>
-              <router-link to="/portfolio">我的持仓</router-link>
-              <router-link to="/transactions">交易记录</router-link>
-              <router-link to="/analysis">账户分析</router-link>
-              <router-link to="/stock-analysis">个股盈亏分析</router-link>
+              <router-link to="/trade" class="nav-link">交易</router-link>
+              <router-link to="/portfolio" class="nav-link">我的持仓</router-link>
+              <router-link to="/transactions" class="nav-link">交易记录</router-link>
+              <router-link to="/analysis" class="nav-link">账户分析</router-link>
+              <router-link to="/stock-analysis" class="nav-link">个股盈亏分析</router-link>
             </template>
 
             <!-- 游客菜单 -->
             <template v-else>
-              <router-link to="/register">注册</router-link>
-              <router-link to="/login">登录</router-link>
+              <router-link to="/register" class="nav-link">注册</router-link>
+              <router-link to="/login" class="nav-link">登录</router-link>
             </template>
 
             <!-- 登录用户信息 -->
@@ -94,6 +85,7 @@ const handleLogout = async () => {
 </template>
 
 <style scoped>
+/* 保持原有样式不变 */
 * {
   margin: 0;
   padding: 0;
@@ -216,6 +208,7 @@ body {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -242,7 +235,8 @@ body {
   color: #4dabf7;
 }
 
-.header-right {
+/* 用户信息样式 */
+.user-info {
   display: flex;
   gap: 8px;
 }
@@ -276,6 +270,12 @@ body {
   gap: 15px;
 }
 
+.welcome-text {
+  font-size: 0.95rem;
+  color: #495057;
+  font-weight: 500;
+}
+
 /* 认证按钮样式 */
 .auth-btn {
   padding: 12px 24px;
@@ -302,53 +302,6 @@ body {
   display: inline-block;
 }
 
-.login-btn {
-  background: transparent;
-  color: #4dabf7;
-  border: 1px solid #4dabf7;
-}
-
-.login-btn:hover {
-  background: rgba(77, 171, 247, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.2);
-}
-
-.register-btn {
-  background: #4dabf7;
-  color: white;
-  border: 1px solid transparent;
-  text-align: center;
-  display: inline-block;
-}
-
-.login-btn {
-  background: transparent;
-  color: #4dabf7;
-  border: 1px solid #4dabf7;
-}
-
-.login-btn:hover {
-  background: rgba(77, 171, 247, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.2);
-}
-
-.register-btn {
-  background: #4dabf7;
-  color: white;
-  border: 1px solid transparent;
-}
-
-
-.register-btn:hover {
-  background: #339af0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
-}
-
-
-/* 退出按钮改为协调的颜色 */
 .logout-btn {
   background: #6c757d;
   color: white;
@@ -421,7 +374,7 @@ body {
   .nav-links {
     gap: 5px;
   }
-
+  
   .nav-link {
     padding: 8px 16px;
     font-size: 0.9rem;

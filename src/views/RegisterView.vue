@@ -1,7 +1,9 @@
 <template>
   <div class="register-container">
     <div class="register-card">
-      <button @click="goBack" class="back-btn">← 返回大盘行情</button>
+      <button @click="goBack" class="back-btn">
+        ← 返回大盘行情
+      </button>
       <h2>用户注册</h2>
       <el-form :model="form" :rules="rules" ref="registerForm" label-width="80px">
         <el-form-item label="用户名" prop="username">
@@ -14,9 +16,7 @@
           <el-input v-model="form.confirmPassword" type="password" placeholder="请再次输入密码" />
         </el-form-item>
         <el-form-item class="button-group">
-          <el-button type="primary" @click="handleRegister" :loading="loading" class="submit-btn"
-            >注册</el-button
-          >
+          <el-button type="primary" @click="handleRegister" :loading="loading" class="submit-btn">注册</el-button>
           <el-button @click="$router.push('/login')" class="switch-btn">返回登录</el-button>
         </el-form-item>
       </el-form>
@@ -75,7 +75,7 @@ const handleRegister = async () => {
     await api.auth.register(form.username, form.password)
     ElMessage.success({
       message: '注册成功！您的账户已创建，默认账户余额为10000元，请登录您的账户。',
-      duration: 5000,
+      duration: 5000
     })
     router.push('/login')
   } catch (e) {

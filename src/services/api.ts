@@ -12,6 +12,8 @@ import type {
   Shareholder,
   StockBasicInfoRequest,
   StockBasicInfoResponse,
+  HistoryRequest,
+  HistoryResponse,
   UserData,
   Event,
   TradeRequest,
@@ -19,7 +21,6 @@ import type {
   HoldingsResponse,
   AnalyzeResponse,
   OrdersResponse,
-  HistoryResponse,
 } from '../types'
 import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 

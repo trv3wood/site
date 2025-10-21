@@ -1,7 +1,9 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <button @click="goBack" class="back-btn">← 返回大盘行情</button>
+      <button @click="goBack" class="back-btn">
+        ← 返回大盘行情
+      </button>
       <h2>用户登录</h2>
       <el-form :model="form" :rules="rules" ref="loginForm" label-width="80px">
         <el-form-item label="用户名" prop="username">
@@ -11,9 +13,7 @@
           <el-input v-model="form.password" type="password" placeholder="请输入密码" />
         </el-form-item>
         <el-form-item class="button-group">
-          <el-button type="primary" @click="handleLogin" :loading="loading" class="submit-btn"
-            >登录</el-button
-          >
+          <el-button type="primary" @click="handleLogin" :loading="loading" class="submit-btn">登录</el-button>
           <el-button @click="$router.push('/register')" class="switch-btn">注册</el-button>
         </el-form-item>
       </el-form>
@@ -22,12 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import api from '@/services/api'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
+const userStore = useUserStore()
 const loginForm = ref()
 const loading = ref(false)
 
@@ -50,18 +52,32 @@ const rules = {
 const handleLogin = async () => {
   if (!loginForm.value) return
 
-  const valid = await loginForm.value.validate()
-  if (!valid) return
-
-  loading.value = true
-
   try {
-    await api.auth.login(form.username, form.password)
-    ElMessage.success('登录成功')
-    router.push('/market')
-  } catch (error) {
-    ElMessage.error('登录失败，请检查网络连接')
+    const valid = await loginForm.value.validate()
+    if (!valid) return
+
+    loading.value = true
+
+    const response = await api.auth.login(form.username, form.password)
+    
+    if (response.success) {
+      ElMessage.success('登录成功')
+      
+      // 等待下一个 tick 确保状态更新完成
+      await nextTick()
+      
+      // 直接跳转，不调用不存在的方法
+      router.push('/market')
+    } else {
+      ElMessage.error(response.message || '登录失败，请检查用户名和密码')
+    }
+  } catch (error: any) {
     console.error('Login error:', error)
+    if (error.response?.data?.message) {
+      ElMessage.error(error.response.data.message)
+    } else {
+      ElMessage.error('登录失败，请检查网络连接')
+    }
   } finally {
     loading.value = false
   }
