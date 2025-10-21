@@ -192,6 +192,7 @@ export interface Holding {
   avg_cost: number
   profit_rate: number
   profit: number
+  current_price: number
   [property: string]: any
 }
 

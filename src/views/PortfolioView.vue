@@ -59,7 +59,7 @@
                 <td>{{ holding.quantity.toLocaleString() }}</td>
                 <td>{{ formatCurrency(holding.avg_cost) }}</td>
                 <td>
-                  {{ formatCurrency(holding.current_price || calculateCurrentPrice(holding)) }}
+                  {{ formatCurrency(holding.current_price) }}
                 </td>
                 <td :class="getProfitClass(holding.profit)">
                   {{ formatCurrency(holding.profit) }}
@@ -109,7 +109,7 @@
                 <label>当前价格：</label>
                 <span>{{
                   formatCurrency(
-                    selectedStock.current_price || calculateCurrentPrice(selectedStock)
+                    selectedStock.current_price
                   )
                 }}</span>
               </div>
@@ -119,7 +119,7 @@
                 <label>持仓市值：</label>
                 <span>{{
                   formatCurrency(
-                    (selectedStock.current_price || calculateCurrentPrice(selectedStock)) *
+                    selectedStock.current_price *
                       selectedStock.quantity
                   )
                 }}</span>
@@ -135,7 +135,7 @@
                 <label>盈亏比例：</label>
                 <span :class="getProfitClass(selectedStock.profit)">
                   {{ selectedStock.profit >= 0 ? '+' : ''
-                  }}{{ calculateProfitRate(selectedStock) }}%
+                  }}{{ (selectedStock.profit_rate * 100).toFixed(4) }}%
                 </span>
               </div>
             </el-col>
@@ -146,18 +146,18 @@
         <div class="profit-analysis">
           <h4>盈亏分析</h4>
           <el-progress
-            :percentage="Math.abs(Number(calculateProfitRate(selectedStock)))"
+            :percentage="selectedStock.profit_rate"
             :status="selectedStock.profit >= 0 ? 'success' : 'exception'"
             :show-text="false"
           />
           <div class="analysis-text">
             <p v-if="selectedStock.profit > 0">
               当前盈利 {{ formatCurrency(selectedStock.profit) }} 元，相比成本上涨
-              {{ calculateProfitRate(selectedStock) }}%
+              {{ formatRate(selectedStock.profit_rate)}}%
             </p>
             <p v-else-if="selectedStock.profit < 0">
               当前亏损 {{ formatCurrency(Math.abs(selectedStock.profit)) }} 元，相比成本下跌
-              {{ Math.abs(Number(calculateProfitRate(selectedStock))) }}%
+              {{formatRate(selectedStock.profit_rate)}}%
             </p>
             <p v-else>当前不盈不亏</p>
           </div>
@@ -198,19 +198,9 @@ const userBalance = computed(() => userStore.user?.balance || 0)
 const formatCurrency = (value: number) => {
   return '¥' + value.toFixed(2)
 }
-
-// 计算最新价格
-const calculateCurrentPrice = (holding: Holding) => {
-  if (holding.quantity === 0) return holding.avg_cost
-  return holding.avg_cost + holding.profit / holding.quantity
+function formatRate(value: number) {
+  return (value * 100).toFixed(4)
 }
-
-// 计算盈亏比例
-const calculateProfitRate = (holding: Holding) => {
-  if (holding.avg_cost === 0) return '0.00'
-  return ((holding.profit / (holding.avg_cost * holding.quantity)) * 100).toFixed(2)
-}
-
 // 获取盈亏样式类
 const getProfitClass = (profit: number) => {
   if (profit > 0) return 'profit-positive'

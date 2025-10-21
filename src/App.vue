@@ -58,7 +58,6 @@ const handleLogout = async () => {
               <router-link to="/portfolio" class="nav-link">我的持仓</router-link>
               <router-link to="/transactions" class="nav-link">交易记录</router-link>
               <router-link to="/analysis" class="nav-link">账户分析</router-link>
-              <router-link to="/stock-analysis" class="nav-link">个股盈亏分析</router-link>
             </template>
 
             <!-- 游客菜单 -->
