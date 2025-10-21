@@ -66,6 +66,8 @@ const handleLogout = async () => {
               <router-link to="/trade">交易</router-link>
               <router-link to="/portfolio">我的持仓</router-link>
               <router-link to="/transactions">交易记录</router-link>
+              <router-link to="/analysis">账户分析</router-link>
+              <router-link to="/stock-analysis">个股盈亏分析</router-link>
             </template>
 
             <!-- 游客菜单 -->
@@ -102,6 +104,8 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
   color: #495057;
+  background-color: #f8f9fa;
+  color: #495057;
 }
 
 /* 加载样式 */
@@ -112,10 +116,12 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -128,8 +134,13 @@ body {
   height: 50px;
   border: 4px solid #e9ecef;
   border-top: 4px solid #4dabf7;
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e9ecef;
+  border-top: 4px solid #4dabf7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
   margin: 0 auto 15px;
 }
 
@@ -147,9 +158,10 @@ body {
 .app-content {
   min-height: 100vh;
   background: #f8f9fa;
+  background: #f8f9fa;
 }
 
-/* 头部样式 - 淡色系 */
+/* 头部样式 - 淡色系 - 淡色系 */
 .app-header {
   background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
   color: #495057;
@@ -163,6 +175,7 @@ body {
 
 .header-content {
   max-width: 1400px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -175,10 +188,18 @@ body {
   display: flex;
   align-items: center;
   gap: 40px;
+  height: 70px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
 .app-title {
   font-size: 1.8rem;
+  font-weight: 700;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -189,9 +210,39 @@ body {
 .app-title:hover {
   transform: translateY(-2px);
   color: #4dabf7;
+  transform: translateY(-2px);
+  color: #4dabf7;
 }
 
 .nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  color: #495057;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: rgba(77, 171, 247, 0.1);
+  border-color: rgba(77, 171, 247, 0.3);
+  transform: translateY(-2px);
+}
+
+.nav-link.router-link-active {
+  background: rgba(77, 171, 247, 0.15);
+  border-color: rgba(77, 171, 247, 0.4);
+  color: #4dabf7;
+}
+
+.header-right {
   display: flex;
   gap: 8px;
 }
@@ -234,7 +285,39 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
+  gap: 15px;
+}
+
+/* 认证按钮样式 */
+.auth-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
   text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.login-btn {
+  background: transparent;
+  color: #4dabf7;
+  border: 1px solid #4dabf7;
+}
+
+.login-btn:hover {
+  background: rgba(77, 171, 247, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.2);
+}
+
+.register-btn {
+  background: #4dabf7;
+  color: white;
+  border: 1px solid transparent;
   text-align: center;
   display: inline-block;
 }
@@ -257,11 +340,13 @@ body {
   border: 1px solid transparent;
 }
 
+
 .register-btn:hover {
   background: #339af0;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
 }
+
 
 /* 退出按钮改为协调的颜色 */
 .logout-btn {
@@ -281,9 +366,13 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
+  gap: 15px;
 }
 
 .welcome-text {
+  font-size: 0.95rem;
+  color: #495057;
+  font-weight: 500;
   font-size: 0.95rem;
   color: #495057;
   font-weight: 500;
@@ -292,12 +381,34 @@ body {
 /* 主内容 */
 .main-content {
   max-width: 1400px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0;
+  background: #f8f9fa;
   padding: 0;
   background: #f8f9fa;
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .header-content {
+    padding: 0 15px;
+  }
+  
+  .header-left {
+    gap: 20px;
+  }
+
+  .nav-links {
+    gap: 5px;
+  }
+  
+  .nav-link {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .header-content {
     padding: 0 15px;
@@ -324,24 +435,25 @@ body {
     padding: 15px;
     gap: 15px;
   }
-
+  
   .header-left {
     flex-direction: column;
     gap: 15px;
     width: 100%;
   }
-
+  
   .app-title {
     text-align: center;
     font-size: 1.6rem;
   }
-
+  
   .nav-links {
+    justify-content: center;
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
   }
-
+  
   .header-right {
     width: 100%;
     justify-content: center;
@@ -351,7 +463,7 @@ body {
     flex-direction: column;
     gap: 10px;
   }
-
+  
   .auth-btn {
     padding: 10px 20px;
     font-size: 0.95rem;
@@ -363,17 +475,17 @@ body {
     flex-direction: column;
     align-items: center;
   }
-
+  
   .nav-link {
     width: 200px;
     text-align: center;
   }
-
+  
   .header-right {
     flex-direction: column;
     gap: 10px;
   }
-
+  
   .auth-btn {
     width: 200px;
   }

@@ -274,7 +274,7 @@ const rawExecutiveTransactions = ref<ExecutiveTransaction[]>([])
 const executiveTransactions = computed(() => {
   return rawExecutiveTransactions.value.map(transaction => ({
     ...transaction,
-    change_type: mapExecutiveChangeType(transaction.change_type),
+    change_type: mapExecutiveChangeType(transaction.change_type)
   }))
 })
 const events = ref<Event[]>([])
@@ -460,7 +460,7 @@ const fetchCategories = async () => {
 }
 
 // 根据激活的标签页加载对应数据
-watch(activeTab, newTab => {
+watch(activeTab, (newTab) => {
   switch (newTab) {
     case 'executives':
       if (executives.value.length === 0) fetchExecutives()
@@ -487,6 +487,7 @@ onMounted(() => {
   fetchCategories()
 })
 // 处理交易按钮点击事件
+const stockStore = useStockStore()
 const handleTradeClick = () => {
   const stockStore = useStockStore()
   stockStore.setStockCode(stockInfo.value?.stock_code || '')
@@ -840,6 +841,95 @@ const handleTradeClick = () => {
   margin-bottom: 30px;
   position: relative;
 }
+
+.tab-pane {
+  padding: 0;
+}
+
+/* 表格样式 */
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background: #f8f9fa;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.data-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f3f4;
+  color: #333;
+}
+
+.data-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* 特殊样式 */
+.change-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.change-type.BUY {
+  background: #d3f9d8;
+  color: #2b8a3e;
+}
+
+.change-type.SELL {
+  background: #ffe3e3;
+  color: #c92a2a;
+}
+
+.change-type.BONUS {
+  background: #fff3bf;
+  color: #e67700;
+}
+
+.positive {
+  color: #51cf66;
+  font-weight: 600;
+}
+
+.negative {
+  color: #f03e3e;
+  font-weight: 600;
+}
+
+.neutral {
+  color: #868e96;
+}
+
+.dividend-plan {
+  font-weight: 600;
+  color: #e67700;
+}
+
+/* 时间线样式 */
+.events-timeline {
+  padding: 30px;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+
 
 .el-table {
   margin-top: 10px;

@@ -123,7 +123,6 @@ const fetchOrderRecords = async () => {
     // 这里需要根据你的实际API调整
     // const response = await api.trade.getOrderHistory()
     // orderRecords.value = response.data || []
-
     // 模拟数据
     orderRecords.value = [
       {
@@ -333,7 +332,6 @@ onMounted(() => {
     gap: 15px;
     align-items: flex-start;
   }
-
   .header-info {
     flex-direction: column;
     align-items: flex-start;

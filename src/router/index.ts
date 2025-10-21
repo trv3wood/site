@@ -78,21 +78,21 @@ const router = createRouter({
       beforeEnter: requireAuth,
       meta: { title: '交易记录' },
     },
-    // {
-    //   path: '/analysis',
-    //   name: 'analysis',
-    //   component: () => import('@/views/AnalysisView.vue'),
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '账户分析' }
-    // },
-    // {
-    //   path: '/stock-analysis',
-    //   name: 'stock-analysis',
-    //   component: () => import('@/views/StockAnalysisView.vue'),
-    //   props: true,
-    //   beforeEnter: requireAuth,
-    //   meta: { title: '个股盈亏分析' }
-    // },
+    {
+      path: '/analysis',
+      name: 'analysis',
+      component: () => import('@/views/AnalysisView.vue'),
+      beforeEnter: requireAuth,
+      meta: { title: '账户分析' }
+    },
+    {
+      path: '/stock-analysis',
+      name: 'stock-analysis',
+      component: () => import('@/views/StockAnalysisView.vue'),
+      props: true,
+      beforeEnter: requireAuth,
+      meta: { title: '个股盈亏分析' }
+    },
 
     // // 404 页面
     // {
