@@ -161,7 +161,7 @@ export interface StockBasicInfoResponse {
 
 export interface YearQueryParam {
   stock_id: number
-  year: number | null
+  start_year?: number
 }
 
 export interface PageQueryParam {
@@ -246,4 +246,9 @@ export interface Stock {
   stock_name: string
   current_price: number
   change: number
+}
+
+export interface Items<T> {
+  total: number
+  data: T[]
 }

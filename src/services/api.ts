@@ -12,7 +12,6 @@ import type {
   Shareholder,
   StockBasicInfoRequest,
   StockBasicInfoResponse,
-  HistoryRequest,
   HistoryResponse,
   UserData,
   Event,
@@ -22,6 +21,7 @@ import type {
   AnalyzeResponse,
   OrdersResponse,
   Stock,
+  Items,
 } from '../types'
 import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 
@@ -165,7 +165,7 @@ export const marketAPI = {
 // 股票详情相关API
 export const stockAPI = {
   // 获取高管信息
-  async getExecutives(params: PageQueryParam): Promise<Executive[]> {
+  async getExecutives(params: PageQueryParam): Promise<Items<Executive>> {
     return get(`/api/stock/executives`, {
       params,
     })
@@ -179,14 +179,14 @@ export const stockAPI = {
   },
 
   // 获取公司事件
-  async getEvents(params: PageQueryParam): Promise<Event[]> {
+  async getEvents(params: PageQueryParam): Promise<Items<Event>> {
     return get(`./api/stock/events`, {
       params,
     })
   },
 
   // 获取股东信息
-  async getShareholders(params: PageQueryParam): Promise<Shareholder[]> {
+  async getShareholders(params: PageQueryParam): Promise<Items<Shareholder>> {
     return get(`./api/stock/shareholders`, {
       params,
     })
@@ -212,10 +212,7 @@ export const stockAPI = {
       params,
     })
   },
-}
-// 分类相关API
-export const categoryAPI = {
-  // 获取概念和行业分类
+
   async getCategories(params: CategoriesRequest): Promise<CategoriesResponse> {
     return get('/api/stock/categories', {
       params,
@@ -241,7 +238,6 @@ export default {
   trade: tradeAPI,
   market: marketAPI,
   stock: stockAPI,
-  category: categoryAPI,
   holdings: holdingsAPI,
   client: {
     apiRequest,
