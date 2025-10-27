@@ -282,6 +282,7 @@ const buildMinimalAnalysisData = (): any[] => {
 // 根据时间段筛选数据
 const filterDataByTimeRange = () => {
   const days = daysMap[selectedTimeRange.value]
+  if (!days) return
   const cutoffDate = new Date()
   cutoffDate.setDate(cutoffDate.getDate() - days)
 

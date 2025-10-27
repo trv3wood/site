@@ -22,5 +22,18 @@ export default defineConfig(({ mode }) => {
     define: {
       __APP_ENV__: JSON.stringify(env),
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor': ['vue', 'vue-router', 'pinia'],
+            'element-plus': ['element-plus'],
+            'charts': ['chart.js', 'vue-chart-3'],
+            'utils': ['axios']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000 // 提高警告阈值
+    }
   }
 })
