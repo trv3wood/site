@@ -33,7 +33,7 @@
       <div class="error-icon">⚠️</div>
       <div class="error-content">
         <p>{{ error }}</p>
-        <button @click="fetchMarketData" class="action-btn retry-btn">重试</button>
+        <button @click="setupWebSocketConnection" class="action-btn retry-btn">重试</button>
       </div>
     </div>
 
@@ -44,23 +44,22 @@
           <span class="stock-count">共 {{ stocks.length }} 只股票</span>
           <div class="refresh-controls">
             <div class="refresh-info">
-              <span class="countdown-text">数据自动刷新倒计时: {{ countdown }}秒</span>
+              <span class="countdown-text">连接状态: {{ connectionStatus }}</span>
+              <span v-if="connectionStatus === 'OPEN'" class="countdown-text"> | 下次刷新: {{ countdown }}秒</span>
             </div>
             <div class="refresh-options">
-              <label for="refresh-interval" class="refresh-label">刷新间隔:</label>
-              <select
-                id="refresh-interval"
-                v-model="selectedInterval"
-                @change="updateRefreshInterval"
-                class="refresh-select"
-              >
-                <option value="3000">3秒</option>
-                <option value="5000">5秒</option>
-                <option value="10000">10秒</option>
-                <option value="30000">30秒</option>
-                <option value="60000">1分钟</option>
+              <label class="refresh-label">刷新间隔:</label>
+              <select v-model="selectedInterval" @change="onIntervalChange" class="refresh-select">
+                <option value="1">1秒</option>
+                <option value="2">2秒</option>
+                <option value="3">3秒</option>
+                <option value="5">5秒</option>
+                <option value="10">10秒</option>
+                <option value="30">30秒</option>
+                <option value="60">60秒</option>
               </select>
-              <button @click="manualRefresh" class="action-btn refresh-btn">立即刷新</button>
+              <button @click="refreshNow" class="action-btn refresh-btn" :disabled="connectionStatus !== 'OPEN'">立即刷新</button>
+              <button @click="manualRefresh" class="action-btn refresh-btn">重新连接</button>
             </div>
           </div>
         </div>
@@ -125,7 +124,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { MarketOverviewResponse as Stock } from '@/types/index'
-import { marketAPI } from '@/services/api'
+import { marketAPI, MarketWebSocket } from '@/services/api'
 import { useStockStore } from '@/stores/stock'
 
 const router = useRouter()
@@ -136,16 +135,51 @@ const stocks = ref<Stock[]>([])
 const loading = ref(false)
 const error = ref('')
 const countdown = ref(5)
-const selectedInterval = ref('5000') // 默认5秒
+const selectedInterval = ref('5') // 默认5秒
+const wsConnection = ref<MarketWebSocket | null>(null)
+const connectionStatus = ref('DISCONNECTED')
+let countdownTimer: number | null = null
 
 // 计算属性
-const refreshIntervalMs = computed(() => parseInt(selectedInterval.value))
-const refreshIntervalSeconds = computed(() => refreshIntervalMs.value / 1000)
+const refreshIntervalSeconds = computed(() => parseInt(selectedInterval.value))
+
+// 市场类型映射
+const marketTypeMap = {
+  sh: 'SH',
+  sz: 'SZ',
+  cyb: 'CYB'
+}
+
+// 倒计时相关方法
+const startCountdown = () => {
+  stopCountdown() // 先清除现有定时器
+  countdown.value = refreshIntervalSeconds.value
+
+  countdownTimer = window.setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      countdown.value = refreshIntervalSeconds.value
+    }
+  }, 1000)
+}
+
+const stopCountdown = () => {
+  if (countdownTimer !== null) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+}
+
+const resetCountdown = () => {
+  countdown.value = refreshIntervalSeconds.value
+}
 
 // 方法
-const switchTab = (tab: 'sh' | 'sz' | 'cyb') => {
+const switchTab = async (tab: 'sh' | 'sz' | 'cyb') => {
   activeTab.value = tab
-  fetchMarketData()
+  countdown.value = 5
+  selectedInterval.value = '5'
+  await setupWebSocketConnection()
 }
 
 const formatNumber = (value: number, showSign: boolean = false): string => {
@@ -206,15 +240,102 @@ const getPriceColor = (changeRate: number): string => {
   return ''
 }
 
-const fetchMarketData = async () => {
+// 设置WebSocket连接
+const setupWebSocketConnection = async () => {
+  // 关闭现有连接
+  if (wsConnection.value) {
+    wsConnection.value.disconnect()
+    wsConnection.value = null
+  }
+
+  loading.value = true
+  error.value = ''
+  connectionStatus.value = 'CONNECTING'
+
+  try {
+    // 创建新的WebSocket连接
+    const marketType = marketTypeMap[activeTab.value]
+    wsConnection.value = marketAPI.createMarketWebSocket(marketType)
+
+    // 设置消息处理器
+    wsConnection.value.onMessage((message) => {
+      // 根据消息类型处理
+      if (message.type === 'data') {
+        // 数据更新消息
+        const data = message.data
+        if (!data || data.error) {
+          console.error('WebSocket error:', data?.error)
+          error.value = '获取市场数据失败，请稍后重试'
+        } else {
+          stocks.value = data
+          console.log(`WebSocket收到 ${data.length} 只股票数据`)
+          loading.value = false
+          error.value = ''
+          // 重置倒计时
+          resetCountdown()
+        }
+      } else if (message.type === 'config_ack') {
+        // 配置确认消息
+        console.log(`服务器确认: 刷新间隔已更新为 ${message.interval_sec} 秒`)
+        // 重启倒计时
+        startCountdown()
+      } else if (message.type === 'error') {
+        // 错误消息
+        console.error('服务器错误:', message.message)
+        error.value = message.message || '服务器错误'
+      } else {
+        // 兼容旧格式 (直接返回数组)
+        if (Array.isArray(message)) {
+          stocks.value = message
+          console.log(`WebSocket收到 ${message.length} 只股票数据`)
+          loading.value = false
+          error.value = ''
+          // 重置倒计时
+          resetCountdown()
+        }
+      }
+    })
+
+    wsConnection.value.onError((err) => {
+      console.error('WebSocket连接错误:', err)
+      error.value = 'WebSocket连接失败，请稍后重试'
+      connectionStatus.value = 'ERROR'
+      loading.value = false
+      stopCountdown()
+    })
+
+    wsConnection.value.onClose((event) => {
+      console.log('WebSocket连接关闭:', event.code, event.reason)
+      connectionStatus.value = 'CLOSED'
+      loading.value = false
+      stopCountdown()
+    })
+
+    // 连接WebSocket
+    await wsConnection.value.connect()
+    connectionStatus.value = wsConnection.value.getState()
+    console.log(`WebSocket连接已建立，市场类型: ${marketType}`)
+
+    // 启动倒计时
+    startCountdown()
+  } catch (err) {
+    console.error('WebSocket连接失败:', err)
+    error.value = 'WebSocket连接失败，请稍后重试'
+    connectionStatus.value = 'ERROR'
+    loading.value = false
+  }
+}
+
+// 初始数据获取（备用方案）
+const fetchInitialMarketData = async () => {
   loading.value = true
   error.value = ''
   try {
     const data = await marketAPI.getMarketOverview({ type: activeTab.value })
     stocks.value = data
-    console.log(`获取到 ${data.length} 只股票数据`)
+    console.log(`初始获取 ${data.length} 只股票数据`)
   } catch (err) {
-    console.error('获取市场数据失败:', err)
+    console.error('获取初始市场数据失败:', err)
     error.value = '获取市场数据失败，请稍后重试'
   } finally {
     loading.value = false
@@ -222,49 +343,49 @@ const fetchMarketData = async () => {
 }
 
 const manualRefresh = () => {
-  countdown.value = refreshIntervalSeconds.value
-  fetchMarketData()
+  setupWebSocketConnection()
 }
 
-const updateRefreshInterval = () => {
-  countdown.value = refreshIntervalSeconds.value
-  if (intervalId !== -1) {
-    clearInterval(intervalId)
+// 调整刷新间隔
+const onIntervalChange = () => {
+  if (wsConnection.value && connectionStatus.value === 'OPEN') {
+    const intervalSec = refreshIntervalSeconds.value
+    console.log(`Changing refresh interval to ${intervalSec} seconds`)
+    wsConnection.value.send({
+      type: 'set_interval',
+      interval_sec: intervalSec
+    })
   }
-  if (countdownIntervalId !== -1) {
-    clearInterval(countdownIntervalId)
+}
+
+// 立即刷新
+const refreshNow = () => {
+  if (wsConnection.value && connectionStatus.value === 'OPEN') {
+    console.log('Requesting immediate refresh')
+    wsConnection.value.send({
+      type: 'refresh_now'
+    })
+    // 重置倒计时
+    resetCountdown()
   }
-  setupTimers()
 }
 
-const setupTimers = () => {
-  intervalId = window.setInterval(() => {
-    fetchMarketData()
-  }, refreshIntervalMs.value)
-  countdownIntervalId = window.setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      countdown.value = refreshIntervalSeconds.value
-    }
-  }, 1000)
-}
-
-// 定时器逻辑
-let intervalId: number = -1
-let countdownIntervalId: number = -1
-
+// 组件生命周期
 onMounted(() => {
-  fetchMarketData()
-  setupTimers()
+  // 初始使用HTTP获取数据，然后建立WebSocket连接
+  fetchInitialMarketData().then(() => {
+    setupWebSocketConnection()
+  })
 })
 
 onUnmounted(() => {
-  if (intervalId !== -1) {
-    clearInterval(intervalId)
+  // 清理WebSocket连接
+  if (wsConnection.value) {
+    wsConnection.value.disconnect()
+    wsConnection.value = null
   }
-  if (countdownIntervalId !== -1) {
-    clearInterval(countdownIntervalId)
-  }
+  // 清理倒计时定时器
+  stopCountdown()
 })
 
 const stockStore = useStockStore()
@@ -424,9 +545,16 @@ const handleStockClick = (stock: Stock) => {
   font-size: 0.85rem;
 }
 
-.action-btn:hover {
+.action-btn:hover:not(:disabled) {
   background: #339af0;
   border-color: #339af0;
+}
+
+.action-btn:disabled {
+  background: #adb5bd;
+  border-color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .retry-btn {

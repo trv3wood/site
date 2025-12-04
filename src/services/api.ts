@@ -28,6 +28,9 @@ import type { YearQueryParam, PageQueryParam, DateQueryParam } from '../types'
 // 基础API配置
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
+// WebSocket连接配置
+const WS_BASE_URL = API_BASE_URL?.replace('http://', 'ws://').replace('https://', 'wss://') || 'ws://localhost:8080'
+
 // 创建axios实例
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -55,6 +58,110 @@ apiClient.interceptors.response.use(
     throw error
   }
 )
+
+// WebSocket连接管理
+export class MarketWebSocket {
+  private socket: WebSocket | null = null
+  private reconnectAttempts = 0
+  private maxReconnectAttempts = 3
+  private reconnectDelay = 3000 // 3秒
+  private messageCallbacks: Array<(data: any) => void> = []
+  private errorCallbacks: Array<(error: globalThis.Event) => void> = []
+  private closeCallbacks: Array<(event: CloseEvent) => void> = []
+
+  constructor(private marketType: string) {}
+
+  // 连接WebSocket
+  connect(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const encodedMarketType = encodeURIComponent(this.marketType)
+      const wsUrl = `${WS_BASE_URL}/api/market/ws?type=${encodedMarketType}`
+      this.socket = new WebSocket(wsUrl)
+
+      this.socket.onopen = () => {
+        console.log(`WebSocket connected for market type: ${this.marketType}`)
+        this.reconnectAttempts = 0
+        resolve()
+      }
+
+      this.socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          this.messageCallbacks.forEach(callback => callback(data))
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error)
+        }
+      }
+
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error)
+        this.errorCallbacks.forEach(callback => callback(error))
+        reject(error)
+      }
+
+      this.socket.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason)
+        this.closeCallbacks.forEach(callback => callback(event))
+
+        // 尝试重连
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          setTimeout(() => {
+            this.reconnectAttempts++
+            console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`)
+            this.connect().catch(console.error)
+          }, this.reconnectDelay)
+        }
+      }
+    })
+  }
+
+  // 断开连接
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.close(1000, 'Client disconnected')
+      this.socket = null
+    }
+    this.messageCallbacks = []
+    this.errorCallbacks = []
+    this.closeCallbacks = []
+  }
+
+  // 添加消息监听器
+  onMessage(callback: (data: any) => void): void {
+    this.messageCallbacks.push(callback)
+  }
+
+  // 添加错误监听器
+  onError(callback: (error: globalThis.Event) => void): void {
+    this.errorCallbacks.push(callback)
+  }
+
+  // 添加关闭监听器
+  onClose(callback: (event: CloseEvent) => void): void {
+    this.closeCallbacks.push(callback)
+  }
+
+  // 发送消息（如果需要）
+  send(data: any): void {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(data))
+    } else {
+      console.warn('WebSocket is not connected')
+    }
+  }
+
+  // 获取连接状态
+  getState(): string {
+    if (!this.socket) return 'DISCONNECTED'
+    switch (this.socket.readyState) {
+      case WebSocket.CONNECTING: return 'CONNECTING'
+      case WebSocket.OPEN: return 'OPEN'
+      case WebSocket.CLOSING: return 'CLOSING'
+      case WebSocket.CLOSED: return 'CLOSED'
+      default: return 'UNKNOWN'
+    }
+  }
+}
 
 // 通用请求函数
 async function apiRequest(endpoint: string, options: any = {}): Promise<any> {
@@ -160,6 +267,11 @@ export const marketAPI = {
     return get(`/api/stock/basic`, {
       params,
     })
+  },
+
+  // WebSocket连接市场实时数据
+  createMarketWebSocket(marketType: string): MarketWebSocket {
+    return new MarketWebSocket(marketType)
   },
 }
 // 股票详情相关API
