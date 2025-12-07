@@ -11,11 +11,7 @@
           <button :class="{ active: activeTab === 'sz' }" @click="switchTab('sz')" class="tab-btn">
             深市 (0开头)
           </button>
-          <button
-            :class="{ active: activeTab === 'cyb' }"
-            @click="switchTab('cyb')"
-            class="tab-btn"
-          >
+          <button :class="{ active: activeTab === 'cyb' }" @click="switchTab('cyb')" class="tab-btn">
             创业板 (3开头)
           </button>
         </div>
@@ -58,7 +54,8 @@
                 <option value="30">30秒</option>
                 <option value="60">60秒</option>
               </select>
-              <button @click="refreshNow" class="action-btn refresh-btn" :disabled="connectionStatus !== 'OPEN'">立即刷新</button>
+              <button @click="refreshNow" class="action-btn refresh-btn"
+                :disabled="connectionStatus !== 'OPEN'">立即刷新</button>
               <button @click="manualRefresh" class="action-btn refresh-btn">重新连接</button>
             </div>
           </div>
@@ -83,12 +80,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="stock in stocks"
-              :key="stock.stock_id"
-              @click="handleStockClick(stock)"
-              class="stock-row"
-            >
+            <tr v-for="stock in stocks" :key="stock.stock_id" @click="handleStockClick(stock)" class="stock-row">
               <td class="stock-code">{{ stock.stock_code }}</td>
               <td class="stock-name">{{ stock.stock_name }}</td>
               <td>{{ formatNumber(stock.open_price) }}</td>
@@ -373,9 +365,8 @@ const refreshNow = () => {
 // 组件生命周期
 onMounted(() => {
   // 初始使用HTTP获取数据，然后建立WebSocket连接
-  fetchInitialMarketData().then(() => {
-    setupWebSocketConnection()
-  })
+  fetchInitialMarketData()
+  setupWebSocketConnection()
 })
 
 onUnmounted(() => {
@@ -421,7 +412,8 @@ const handleStockClick = (stock: Stock) => {
   align-items: center;
   margin-bottom: 20px;
   background: white;
-  padding: 16px 20px; /* 调小一点 */
+  padding: 16px 20px;
+  /* 调小一点 */
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
@@ -429,7 +421,8 @@ const handleStockClick = (stock: Stock) => {
 
 .page-title {
   margin: 0;
-  font-size: 1.5rem; /* 调小一点 */
+  font-size: 1.5rem;
+  /* 调小一点 */
   font-weight: 700;
   color: #495057;
 }
@@ -440,7 +433,8 @@ const handleStockClick = (stock: Stock) => {
 }
 
 .tab-btn {
-  padding: 8px 16px; /* 调小一点 */
+  padding: 8px 16px;
+  /* 调小一点 */
   border: 1px solid #4dabf7;
   background: white;
   color: #4dabf7;
@@ -448,7 +442,8 @@ const handleStockClick = (stock: Stock) => {
   border-radius: 6px;
   transition: all 0.3s ease;
   font-weight: 600;
-  font-size: 0.85rem; /* 调小一点 */
+  font-size: 0.85rem;
+  /* 调小一点 */
 }
 
 .tab-btn:hover {
@@ -594,6 +589,7 @@ const handleStockClick = (stock: Stock) => {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -715,34 +711,41 @@ const handleStockClick = (stock: Stock) => {
   .market-view {
     padding: 15px;
   }
+
   .header-top {
     flex-direction: column;
     gap: 15px;
     align-items: stretch;
   }
+
   .page-title {
     text-align: center;
     font-size: 1.4rem;
   }
+
   .market-tabs {
     justify-content: center;
     flex-wrap: wrap;
   }
+
   .table-info {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
   }
+
   .refresh-controls {
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
+
   .refresh-options {
     flex-wrap: wrap;
     gap: 5px;
   }
+
   .stock-table th,
   .stock-table td {
     padding: 10px 8px;
@@ -765,6 +768,7 @@ const handleStockClick = (stock: Stock) => {
     gap: 10px;
     align-items: stretch;
   }
+
   .refresh-options {
     flex-direction: column;
     gap: 8px;
