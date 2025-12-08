@@ -172,7 +172,8 @@ const switchTab = async (tab: 'sh' | 'sz' | 'cyb') => {
   activeTab.value = tab
   countdown.value = 5
   selectedInterval.value = '5'
-  await setupWebSocketConnection()
+  setupWebSocketConnection()
+  await fetchInitialMarketData()
 }
 
 const formatNumber = (value: number, showSign: boolean = false): string => {

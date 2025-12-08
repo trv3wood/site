@@ -62,9 +62,9 @@ apiClient.interceptors.response.use(
 // WebSocket连接管理
 export class MarketWebSocket {
   private socket: WebSocket | null = null
-  private reconnectAttempts = 0
-  private maxReconnectAttempts = 3
-  private reconnectDelay = 3000 // 3秒
+  // private reconnectAttempts = 0
+  // private maxReconnectAttempts = 3
+  // private reconnectDelay = 3000 // 3秒
   private messageCallbacks: Array<(data: any) => void> = []
   private errorCallbacks: Array<(error: globalThis.Event) => void> = []
   private closeCallbacks: Array<(event: CloseEvent) => void> = []
@@ -80,7 +80,7 @@ export class MarketWebSocket {
 
       this.socket.onopen = () => {
         console.log(`WebSocket connected for market type: ${this.marketType}`)
-        this.reconnectAttempts = 0
+        // this.reconnectAttempts = 0
         resolve()
       }
 
@@ -102,15 +102,6 @@ export class MarketWebSocket {
       this.socket.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason)
         this.closeCallbacks.forEach(callback => callback(event))
-
-        // 尝试重连
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
-          setTimeout(() => {
-            this.reconnectAttempts++
-            console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`)
-            this.connect().catch(console.error)
-          }, this.reconnectDelay)
-        }
       }
     })
   }
