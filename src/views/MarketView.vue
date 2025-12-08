@@ -143,8 +143,9 @@ const marketTypeMap = {
 }
 
 // 倒计时相关方法
-const startCountdown = () => {
+const startCountdown = (interval_sec: number) => {
   stopCountdown() // 先清除现有定时器
+  selectedInterval.value = interval_sec.toString()
   countdown.value = refreshIntervalSeconds.value
 
   countdownTimer = window.setInterval(() => {
@@ -270,7 +271,7 @@ const setupWebSocketConnection = async () => {
         // 配置确认消息
         console.log(`服务器确认: 刷新间隔已更新为 ${message.interval_sec} 秒`)
         // 重启倒计时
-        startCountdown()
+        startCountdown(message.interval_sec)
       } else if (message.type === 'error') {
         // 错误消息
         console.error('服务器错误:', message.message)
@@ -309,7 +310,7 @@ const setupWebSocketConnection = async () => {
     console.log(`WebSocket连接已建立，市场类型: ${marketType}`)
 
     // 启动倒计时
-    startCountdown()
+    startCountdown(5)
   } catch (err) {
     console.error('WebSocket连接失败:', err)
     error.value = 'WebSocket连接失败，请稍后重试'
