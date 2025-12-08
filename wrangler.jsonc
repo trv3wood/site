@@ -1,0 +1,9 @@
+{
+  "name": "site",
+  "compatibility_date": "2025-12-08",
+  "assets": {
+    "directory": "./dist"
+  },
+  // 对于 SPA 应用，添加路由回退
+  "serve_single_page_app": true
+}
