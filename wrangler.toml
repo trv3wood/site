@@ -1,0 +1,9 @@
+# 1. Worker 基础配置
+name = "site"
+main = "src/worker.js" # 【关键】：添加 Worker 脚本入口
+compatibility_date = "2025-12-08"
+
+# 2. 静态资产配置 (对应原 assets 字段)
+[site]
+bucket = "./dist"
+single_page_application = true # 对应原 serve_single_page_app: true
