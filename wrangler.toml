@@ -1,9 +1,9 @@
-# 1. Worker 基础配置
-name = "site"
-main = "src/worker.js"
-compatibility_date = "2025-12-08"
-
-# 2. 静态资产配置 (对应原 assets 字段)
 [site]
 bucket = "./dist"
-fallback = "index.html"
+
+[build.upload]
+format = "modules"
+main = "src/worker.js"
+
+[[routes]]
+pattern = "darker233.top/*"

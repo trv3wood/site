@@ -1,13 +1,15 @@
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
+    // API routes → handled by Worker
     if (url.pathname.startsWith("/api/")) {
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { "content-type": "application/json" }
+      return new Response(JSON.stringify({ message: "API works" }), {
+        headers: { "Content-Type": "application/json" },
       });
     }
 
-    return fetch(request);
+    // Static assets + SPA fallback will be served automatically
+    return env.ASSETS.fetch(request);
   }
-};
+}
